@@ -18,19 +18,20 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
             include( getShopBasePath() . $this->_sConfigFile );
         }
         
-        if( array_key_exists( $sModuleVarName, $this->_staticEntries ) )
+        if( isset( $this->_staticEntries ) && array_key_exists( $sModuleVarName, $this->_staticEntries ) )
         {
             return unserialize($this->_staticEntries[$sModuleVarName]);
         }
-        
         $result = parent::getModuleVar($sModuleVarName);
         
-        $sLogDist       = 'log/yamm_entries.txt';
+        $sLogDist       = getShopBasePath() . 'log/yamm_entries.txt';
         $sLogMessage    = $sModuleVarName . ': ' .  serialize($result) . "\n";
         
         if(!$this->alreadyWritten)
         {
-            unlink($sLogDist);
+            if (file_exists($sLogDist)) {
+                unlink($sLogDist);
+            }
             $this->alreadyWritten = true;
             
         }
@@ -42,6 +43,6 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
         
         return $result;
     }
-    
+
 }
 
