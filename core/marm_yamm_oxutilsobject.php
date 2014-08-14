@@ -10,6 +10,8 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
     
     protected $_sConfigFile = 'marm_yamm.config.php';
 
+    protected $_staticEntries = null;
+
     public function getModuleVar( $sModuleVarName )
     {
         
