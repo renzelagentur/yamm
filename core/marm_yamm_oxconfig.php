@@ -9,7 +9,7 @@ class marm_yamm_oxconfig extends marm_yamm_oxconfig_parent
 {    
     protected $_sConfigFile = 'marm_yamm.config.php';
     
-    protected $_staticEntries = array();
+    protected $_staticEntries = null;
 
     public function init()
     {
@@ -19,11 +19,10 @@ class marm_yamm_oxconfig extends marm_yamm_oxconfig_parent
         {
             include( getShopBasePath() . $this->_sConfigFile );
         }
-        
-        foreach( $this->_staticEntries as $name => $config )
-        {
-            $this->_aConfigParams[$name] = unserialize($config);
+        if (isset( $this->_staticEntries )) {
+            foreach( $this->_staticEntries as $name => $config ) {
+                $this->_aConfigParams[$name] = unserialize($config);
+            }
         }
     }
-    
 }
