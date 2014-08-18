@@ -14,15 +14,8 @@ class marm_yamm_oxconfig extends marm_yamm_oxconfig_parent
     public function init()
     {
         parent::init();
-        
-        if( !isset( $this->_staticEntries ) && file_exists( getShopBasePath() . $this->_sConfigFile ) )
-        {
-            include( getShopBasePath() . $this->_sConfigFile );
-        }
-        if (isset( $this->_staticEntries )) {
-            foreach( $this->_staticEntries as $name => $config ) {
-                $this->_aConfigParams[$name] = unserialize($config);
-            }
+        foreach (array('aModules', 'aDisabledModules', 'aModulePaths') as $name) {
+            $this->_aConfigParams[$name] = oxUtilsObject::getInstance()->getModuleVar($name);
         }
     }
 }
