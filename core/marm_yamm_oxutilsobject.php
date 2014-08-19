@@ -53,6 +53,10 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
         	{
         		return array_diff(array_merge(parent::getModuleVar($sModuleVarName), $this->_staticEntries[$sModuleVarName]), $this->_staticEntries['aYAMMEnabledModules']);
         	}
+			elseif ( $sModuleVarName === 'aYAMMEnabledModules' )
+			{
+				return $this->_staticEntries[$sModuleVarName];
+			}
         	else
         	{
 				return array_merge(parent::getModuleVar($sModuleVarName), $this->_staticEntries[$sModuleVarName]);

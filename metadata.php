@@ -29,5 +29,13 @@ $aModule = array(
     'extend'        => array(
         'oxconfig'          => 'marm/yamm/core/marm_yamm_oxconfig',
         'oxutilsobject'     => 'marm/yamm/core/marm_yamm_oxutilsobject',
-    )
+        'oxmodule'			=> 'marm/yamm/core/marm_yamm_oxmodule',
+        'module_list'		=> 'marm/yamm/core/marm_yamm_module_list',
+    ),
+    'templates' => array(
+        'marm_yamm_module_list.tpl' => 'marm/yamm/views/admin/tpl/marm_yamm_module_list.tpl',
+    ),
+	'blocks' => array(
+		array( 'template' => 'headitem.tpl', 'block' => 'admin_headitem_inccss', 'file' => 'views/admin/blocks/marm_yamm_inccss.tpl'),
+	),
 ); 
