@@ -6,4 +6,5 @@ $aLang = array(
 	'charset' => 'utf-8',
 	'MANUALLY_ACTIVATED' => 'Manuell Aktiviert',
 	'YAMM_ACTIVATED' => 'Von YAMM Aktiviert',
+	'YAMM_DISABLED' => 'Von YAMM Blockiert',
 );

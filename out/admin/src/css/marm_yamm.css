@@ -29,6 +29,14 @@
     min-width: 17px;
 }
 
+#liste td.yamm_disabled,
+#liste aside.legend dt.yamm_disabled {
+    background-image: url("../bg/ico_yamm_disabled.gif");
+    background-position: center center;
+    background-repeat: no-repeat;
+    min-width: 17px;
+}
+
 #liste aside.legend dt.active {
     background-image: url("/out/admin/src/bg/ico_active.gif");
     background-position: center center;

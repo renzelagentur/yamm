@@ -28,10 +28,10 @@ The file `marm_yamm.config.php` must contain all information regarding predefine
 ```php
 <?php
 $this->_staticEntries = array(
-	'aYAMMEnabledModules' => array(), //required
-    'aModulePaths' => array(),        // required
-    'aDisabledModules' => array(),    // optional
-    'bYAMMRenice' => false,           // optional
+	'aYAMMEnabledModules' => array(),  //required
+    'aYAMMDisabledModules' => array(), // required
+    'aDisabledModules' => array(),     // optional
+    'bYAMMRenice' => false,            // optional
     /* Any other keys go here */
 );
 
@@ -39,7 +39,7 @@ $this->_staticEntries = array(
 
  * **aYAMMEnabledModules** is a simple array containing the IDs of all modules to be loaded, in loading order.
  * **aModulePaths** is an associative array mapping module IDs to directories. This is used by YAMM to find all metadata files!
- * **aDisabledModules** is a simple array of containing the IDs of all modules that should be disabled. This takes precedence over OXiDs own settings, while itself beeing superseded by **aYAMMEnabledModules** .
+ * **aYAMMDisabledModules** is a simple array of containing the IDs of all modules that should be disabled. This takes precedence over OXiDs own settings, while itself beeing superseded by **aYAMMEnabledModules** .
  * **bYAMMRenice** tells YAMM wether it should keep the inheritance order set in OXiDs backend, or to enforce the order given by **aYAMMEnabledModules**
  
  Any other key will be written directly into `oxConfig` .

@@ -28,6 +28,8 @@ window.onload = function ()
 		<dd>[{ oxmultilang ident="MANUALLY_ACTIVATED" }]</dd>
 		<dt class="yamm_active">&nbsp;</dt>
 		<dd>[{ oxmultilang ident="YAMM_ACTIVATED" }]</dd>
+		<dt class="yamm_disabled">&nbsp;</dt>
+		<dd>[{ oxmultilang ident="YAMM_DISABLED" }]</dd>
 	</dl>
 </aside>
 
@@ -69,7 +71,7 @@ window.onload = function ()
     [{ if $listitem->getInfo('id') == $oxid }]
         [{assign var="zebra" value=listitem4 }]
     [{ /if}]
-    <td valign="top" class="[{$zebra}][{ if $listitem->isYAMM() }] yamm_active[{ elseif $listitem->isActive() }] active[{/if}]" height="15">
+    <td valign="top" class="[{$zebra}][{ if $listitem->isEnabledByYAMM() }] yamm_active[{ elseif $listitem->isDisabledByYAMM() }] yamm_disabled[{ elseif $listitem->isActive() }] active[{/if}]" height="15">
         <div class="listitemfloating">
             <a href="Javascript:top.oxid.admin.editThis('[{ $listitem->getId() }]');">&nbsp;</a></div>
         </div>
