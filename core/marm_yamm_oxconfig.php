@@ -13,8 +13,13 @@ class marm_yamm_oxconfig extends marm_yamm_oxconfig_parent
 
     public function init()
     {
+    	if ($this->_blInit)
+    	{
+           return;
+        }
         parent::init();
-        foreach (array('aModules', 'aDisabledModules', 'aModulePaths') as $name) {
+        foreach (oxUtilsObject::getInstance()->getYAMMKeys() as $name)
+        {
             $this->_aConfigParams[$name] = oxUtilsObject::getInstance()->getModuleVar($name);
         }
     }

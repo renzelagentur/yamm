@@ -11,6 +11,10 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
     protected $_sConfigFile = 'marm_yamm.config.php';
 
     protected $_staticEntries = null;
+	
+	public function getYAMMKeys() {
+		return array_keys($this->_staticEntries);
+	}
 
     public function getModuleVar( $sModuleVarName )
     {
@@ -33,8 +37,18 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
 				{
 					if ( isset($this->_staticEntries['aModules'][$class]) )
 					{
-						if ( !in_array($path, $this->_staticEntries['aModules'][$class]) )
-							$this->_staticEntries['aModules'][$class][] = $path;
+						if ( in_array($path, $this->_staticEntries['aModules'][$class]) )
+						{
+							if ( !$this->_staticEntries['bYAMMRenice'] )
+							{
+								continue;
+							}
+							if(($key = array_search($path, $this->_staticEntries['aModules'][$class])) !== false)
+							{
+    							unset($this->_staticEntries['aModules'][$class][$key]);
+							}
+						}
+						$this->_staticEntries['aModules'][$class][] = $path;
 					}
 					else
 					{
@@ -53,13 +67,13 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
         	{
         		return array_diff(array_merge(parent::getModuleVar($sModuleVarName), $this->_staticEntries[$sModuleVarName]), $this->_staticEntries['aYAMMEnabledModules']);
         	}
-			elseif ( $sModuleVarName === 'aYAMMEnabledModules' )
+			elseif ( is_array($this->_staticEntries[$sModuleVarName]) && parent::getModuleVar($sModuleVarName) )
 			{
-				return $this->_staticEntries[$sModuleVarName];
+				return array_merge(parent::getModuleVar($sModuleVarName), $this->_staticEntries[$sModuleVarName]);
 			}
         	else
         	{
-				return array_merge(parent::getModuleVar($sModuleVarName), $this->_staticEntries[$sModuleVarName]);
+				return $this->_staticEntries[$sModuleVarName];
 			}
         }
         $result = parent::getModuleVar($sModuleVarName);
