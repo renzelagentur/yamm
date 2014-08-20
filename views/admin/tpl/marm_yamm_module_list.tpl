@@ -1,3 +1,12 @@
+[{*
+  * This file is part of a marmalade GmbH project
+  *
+  * It is Open Source and may be redistributed.
+  * For contact information please visit http://www.marmalade.de
+  *
+  * Version:    1.0
+  * Author URI: http://www.marmalade.de
+  *}]
 [{include file="headitem.tpl" title="GENERAL_ADMIN_TITLE"|oxmultilangassign box="list"}]
 
 [{if $readonly}]
