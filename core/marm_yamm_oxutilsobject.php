@@ -21,7 +21,6 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
         
         if( !isset( $this->_staticEntries ) && file_exists( getShopBasePath() . $this->_sConfigFile ) )
         {
-        	$this->_log[] = getShopBasePath() . $this->_sConfigFile;
             include( getShopBasePath() . $this->_sConfigFile );
 			$this->_staticEntries['aModules'] = parent::getModuleVar('aModules');
 			foreach ($this->_staticEntries['aModules'] as $key => $value) {
@@ -29,8 +28,6 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
 			}
 			foreach ( $this->_staticEntries['aYAMMEnabledModules'] as $module )
 			{
-				if ( array_key_exists($this->_staticEntries['aDisabledModule'], $module) )
-					continue;
 				$metaPath = getShopBasePath() . 'modules/' . $this->_staticEntries['aModulePaths'][$module] . '/metadata.php';
 				include( $metaPath );
 				foreach ( $aModule['extend'] as $class => $path )
