@@ -33,11 +33,18 @@ $aModule = array(
         'module_list'		=> 'marm/yamm/core/marm_yamm_module_list',
         'module_main'		=> 'marm/yamm/core/marm_yamm_module_main',
     ),
+    'files' => array(
+		'marm_yamm_events' => 'marm/yamm/core/marm_yamm_events.php',
+	),
     'templates' => array(
         'marm_yamm_module_list.tpl' => 'marm/yamm/views/admin/tpl/marm_yamm_module_list.tpl',
         'marm_yamm_module_main.tpl' => 'marm/yamm/views/admin/tpl/marm_yamm_module_main.tpl',
     ),
 	'blocks' => array(
 		array( 'template' => 'headitem.tpl', 'block' => 'admin_headitem_inccss', 'file' => 'views/admin/blocks/marm_yamm_inccss.tpl'),
+	),
+	'events' => array(
+		//'onActivate' => ''
+		'onDeactivate' => 'marm_yamm_events::deactivate',
 	),
 ); 
