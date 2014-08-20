@@ -44,7 +44,7 @@ $aModule = array(
 		array( 'template' => 'headitem.tpl', 'block' => 'admin_headitem_inccss', 'file' => 'views/admin/blocks/marm_yamm_inccss.tpl'),
 	),
 	'events' => array(
-		//'onActivate' => ''
+		'onActivate' => 'marm_yamm_events::activate',
 		'onDeactivate' => 'marm_yamm_events::deactivate',
 	),
 ); 
