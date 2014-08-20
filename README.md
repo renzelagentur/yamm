@@ -42,7 +42,7 @@ $aYAMMConfig = array(
  * `aModulePaths` is an associative array mapping module IDs to directories. This is used by YAMM to find all metadata files!
  * `aYAMMDisabledModules` is a simple array of containing the IDs of all modules that should be disabled. This takes precedence over OXiDs own settings, while itself beeing superseded by **aYAMMEnabledModules** .
  * `bYAMMRenice` tells YAMM wether it should keep the inheritance order set in OXiDs backend, or to enforce the order given by **aYAMMEnabledModules** . Default is `false` .
- * `bYAMMBlockControl` tells YAMM to block user control of inheritance order and activation of unhandled modules. Default is `false` . Will enforce `bYAMMRenice == true` when activated.
+ * `bYAMMBlockControl` tells YAMM to block user control of inheritance order and activation of unhandled modules. Default is `false` .
  
  Any other key will be written directly into `oxConfig` .
 

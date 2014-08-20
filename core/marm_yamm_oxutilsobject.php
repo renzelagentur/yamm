@@ -59,7 +59,6 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
             include (getShopBasePath() . $this->_sConfigFile);
             $this->_staticEntries = $aYAMMConfig;
             $this->handleConfigChanges();
-            $this->_staticEntries['bYAMMRenice'] = $this->_staticEntries['bYAMMRenice'] || $this->_staticEntries['bYAMMBlockControl'];
             $this->_staticEntries['aModules'] = parent::getModuleVar('aModules');
             foreach ( $this->_staticEntries['aModules'] as $key => $value )
             {
