@@ -43,3 +43,13 @@
     background-repeat: no-repeat;
     min-width: 17px;
 }
+
+#aModulesList .sortable2.disabled li {
+	cursor: inherit;
+}
+
+#aModulesList .sortable2.disabled li:hover {
+	background: inherit;
+    border: 1px solid transparent;
+    border-radius: 0;
+}

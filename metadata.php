@@ -32,6 +32,7 @@ $aModule = array(
         'oxmodule'			=> 'marm/yamm/core/marm_yamm_oxmodule',
         'module_list'		=> 'marm/yamm/core/marm_yamm_module_list',
         'module_main'		=> 'marm/yamm/core/marm_yamm_module_main',
+        'module_sortlist'	=> 'marm/yamm/core/marm_yamm_module_sortlist',
     ),
     'files' => array(
 		'marm_yamm_events' => 'marm/yamm/core/marm_yamm_events.php',
@@ -39,6 +40,7 @@ $aModule = array(
     'templates' => array(
         'marm_yamm_module_list.tpl' => 'marm/yamm/views/admin/tpl/marm_yamm_module_list.tpl',
         'marm_yamm_module_main.tpl' => 'marm/yamm/views/admin/tpl/marm_yamm_module_main.tpl',
+        'marm_yamm_module_sortlist.tpl' => 'marm/yamm/views/admin/tpl/marm_yamm_module_sortlist.tpl',
     ),
 	'blocks' => array(
 		array( 'template' => 'headitem.tpl', 'block' => 'admin_headitem_inccss', 'file' => 'views/admin/blocks/marm_yamm_inccss.tpl'),

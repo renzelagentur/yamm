@@ -1,6 +1,6 @@
 <?php
 
-class marm_yamm_module_main extends marm_yamm_module_main_parent
+class marm_yamm_module_sortlist extends marm_yamm_module_sortlist_parent
 {
 	
 	public function render()
@@ -8,7 +8,7 @@ class marm_yamm_module_main extends marm_yamm_module_main_parent
 		$x = parent::render();
 		if (defined('MARM_YAMM_TURNED_OFF'))
 			return $x;
-		return 'marm_yamm_module_main.tpl';
+		return 'marm_yamm_module_sortlist.tpl';
 	}
 	
 	public function YAMMBlocksControl()

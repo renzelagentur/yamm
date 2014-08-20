@@ -12,17 +12,20 @@ class marm_yamm_events {
 			return;
 		define('MARM_YAMM_INFINITY_PREVENTION', TRUE);
 		include( getShopBasePath() . $this->_sConfigFile );
+		$this->_staticEntries = $aYAMMConfig;
 		$oModule = oxNew('oxModule');
 		foreach ( $this->_staticEntries['aYAMMEnabledModules'] as $id )
 		{
 			$oModule->load($id);
 			$oModule->activate();
 		}
-		$alreadyDisabled = oxUtilsObject::getInstance()->getModuleVar('aDisabledModules');
-		foreach ( $this->_staticEntries['aYAMMDisabledModules'] as $id )
+		$toDisable = array_diff(
+			$this->_staticEntries['aYAMMDisabledModules'],
+			oxUtilsObject::getInstance()->getModuleVar('aDisabledModules'),
+			$this->_staticEntries['aYAMMEnabledModules']
+		);
+		foreach ( $toDisable as $id )
 		{
-			if ( in_array($id, $alreadyDisabled) || in_array($id, $this->_staticEntries['aYAMMEnabledModules']) )
-				continue;
 			$oModule->load($id);
 			if ( $oModule->isActive() )
 			{
@@ -33,7 +36,7 @@ class marm_yamm_events {
 	
 	protected function deactivate()
 	{
-		define('MARM_YAMM_TURNED_OF', TRUE);
+		define('MARM_YAMM_TURNED_OFF', TRUE);
 	}
 	
 	public static function __callStatic($name, $arguments)

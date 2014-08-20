@@ -12,6 +12,33 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
 
     protected $_staticEntries = null;
 	
+	private function handleConfigChanges()
+	{
+		$cache = getShopBasePath() . 'tmp/' . $this->_sConfigFile;
+		if ( file_exists($cache) && filemtime(getShopBasePath() . $this->_sConfigFile) > filemtime($cache) )
+		{
+			include( $cache );
+			$oModule = oxNew('oxModule');
+			$toActivate = array_diff( $this->_staticEntries['aYAMMEnabledModules'], $aYAMMConfig['aYAMMEnabledModules'] );
+			foreach ($toActivate as $id)
+			{
+				$oModule->load($id);
+				$oModule->activate();
+			}
+			$toDeactivate = array_diff(
+				$this->_staticEntries['aYAMMDisabledModules'],
+				$aYAMMConfig['aYAMMDisabledModules'],
+				$this->_staticEntries['aYAMMEnabledModules']
+			);
+			foreach ($toDeactivate as $id)
+			{
+				$oModule->load($id);
+				$oModule->deactivate();
+			}
+		}
+		copy(getShopBasePath() . $this->_sConfigFile, $cache);
+	}
+	
 	public function getYAMMKeys() {
 		return array_keys($this->_staticEntries);
 	}
@@ -22,6 +49,9 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
         if( !isset( $this->_staticEntries ) && file_exists( getShopBasePath() . $this->_sConfigFile ) )
         {
             include( getShopBasePath() . $this->_sConfigFile );
+			$this->_staticEntries = $aYAMMConfig;
+			$this->handleConfigChanges();
+			$this->_staticEntries['bYAMMRenice'] = $this->_staticEntries['bYAMMRenice'] || $this->_staticEntries['bYAMMBlockControl'];
 			$this->_staticEntries['aModules'] = parent::getModuleVar('aModules');
 			foreach ($this->_staticEntries['aModules'] as $key => $value) {
 				$this->_staticEntries['aModules'][$key] = explode('&', $value);

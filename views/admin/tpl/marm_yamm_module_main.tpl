@@ -75,7 +75,7 @@
         [{/if}]
         [{if !$_sError}]
 
-        [{if ($oModule->hasMetadata() || $oModule->isRegistered()) && !$oModule->isEnabledByYAMM() && !$oModule->isDisabledByYAMM() }]
+        [{if ($oModule->hasMetadata() || $oModule->isRegistered()) && !$oModule->isEnabledByYAMM() && !$oModule->isDisabledByYAMM() && !$oView->YAMMBlocksControl() }]
         <form name="myedit" id="myedit" action="[{ $oViewConf->getSelfLink() }]" method="post">
             <div>
                 [{ $oViewConf->getHiddenSid() }]
