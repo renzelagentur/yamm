@@ -28,11 +28,11 @@ The file `marm_yamm.config.php` must contain all information regarding predefine
 ```php
 <?php
 $aYAMMConfig = array(
-	'aYAMMEnabledModules' => array(),  // required
-	'aModulePaths' => array(),         // required
-    'aYAMMDisabledModules' => array(), // optional
-    'aYAMMForceOrder' => array(),      // optional
-    'bYAMMBlockControl' => false,      // optional
+	'aYAMMEnabledModules' => array(),    // required
+	'aModulePaths' => array(),           // required
+    'aYAMMDisabledModules' => array(),   // optional
+    'aYAMMSpecialClassOrder' => array(), // optional
+    'bYAMMBlockControl' => false,        // optional
     /* Any other keys go here */
 );
 
@@ -41,7 +41,7 @@ $aYAMMConfig = array(
  * `aYAMMEnabledModules` is a simple array containing the IDs of all modules to be loaded, in loading order.
  * `aModulePaths` is an associative array mapping module IDs to directories. This is used by YAMM to find all metadata files!
  * `aYAMMDisabledModules` is a simple array of containing the IDs of all modules that should be disabled. This takes precedence over OXiDs own settings, while itself beeing superseded by **aYAMMEnabledModules** .
- * `bYAMMRenice` tells YAMM wether it should keep the inheritance order set in OXiDs backend, or to enforce the order given by **aYAMMEnabledModules** . Default is `false` .
+ * `aYAMMForceOrder` allows for diverging inheritance orders set for individual classes. For each class name given as key, the extensions made by each module ID present in the value array will be moved to the end of the chain, in given order.
  * `bYAMMBlockControl` tells YAMM to block user control of inheritance order and activation of unhandled modules. Default is `false` .
  
  Any other key will be written directly into `oxConfig` .
