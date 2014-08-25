@@ -134,7 +134,9 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
             }
             elseif ( is_array($this->_staticEntries[$sModuleVarName]) && parent::getModuleVar($sModuleVarName) )
             {
-                return array_merge(parent::getModuleVar($sModuleVarName), $this->_staticEntries[$sModuleVarName]);
+                $old = parent::getModuleVar($sModuleVarName);
+                $new = $this->_staticEntries[$sModuleVarName];
+                return ($new == $old) ? $new : array_merge($old, $new);
             }
             else
             {
