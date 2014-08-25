@@ -29,9 +29,9 @@ The file `marm_yamm.config.php` must contain all information regarding predefine
 <?php
 $aYAMMConfig = array(
 	'aYAMMEnabledModules' => array(),  // required
-    'aYAMMDisabledModules' => array(), // required
-    'aDisabledModules' => array(),     // optional
-    'bYAMMRenice' => false,            // optional
+	'aModulePaths' => array(),         // required
+    'aYAMMDisabledModules' => array(), // optional
+    'aYAMMForceOrder' => array(),      // optional
     'bYAMMBlockControl' => false,      // optional
     /* Any other keys go here */
 );

@@ -23,7 +23,7 @@ class marm_yamm_module_main extends marm_yamm_module_main_parent
 
     public function YAMMBlocksControl()
     {
-        return oxUtilsObject::getInstance()->getModuleVar('bYAMMBlockControl');
+        return oxUtilsObject::getInstance()->getModuleVar(marm_yamm_oxutilsobject::BLOCK_CONTROL);
     }
 
 }

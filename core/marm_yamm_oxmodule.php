@@ -15,12 +15,12 @@ class marm_yamm_oxmodule extends marm_yamm_oxmodule_parent
 
     public function isEnabledByYAMM()
     {
-        return in_array($this->getId(), oxUtilsObject::getInstance()->getModuleVar('aYAMMEnabledModules'));
+        return in_array($this->getId(), oxUtilsObject::getInstance()->getModuleVar(marm_yamm_oxutilsobject::ENABLED));
     }
 
     public function isDisabledByYAMM()
     {
-        return in_array($this->getId(), oxUtilsObject::getInstance()->getModuleVar('aYAMMDisabledModules'));
+        return in_array($this->getId(), oxUtilsObject::getInstance()->getModuleVar(marm_yamm_oxutilsobject::DISABLED));
     }
 
 }

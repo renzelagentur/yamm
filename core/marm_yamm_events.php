@@ -25,16 +25,16 @@ class marm_yamm_events
         include (getShopBasePath() . $this->_sConfigFile);
         $this->_staticEntries = $aYAMMConfig;
         $oModule = oxNew('oxModule');
-        foreach ( $this->_staticEntries['aYAMMEnabledModules'] as $id )
+        foreach ( $this->_staticEntries[marm_yamm_oxutilsobject::ENABLED] as $id )
         {
             $oModule->load($id);
             $oModule->activate();
         }
         // @formatter:off
         $toDisable = array_diff(
-            $this->_staticEntries['aYAMMDisabledModules'],
+            $this->_staticEntries[marm_yamm_oxutilsobject::DISABLED],
             oxUtilsObject::getInstance()->getModuleVar('aDisabledModules'),
-            $this->_staticEntries['aYAMMEnabledModules']
+            $this->_staticEntries[marm_yamm_oxutilsobject::ENABLED]
         );
         // @formatter:on
         foreach ( $toDisable as $id )

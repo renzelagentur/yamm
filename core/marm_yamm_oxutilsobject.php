@@ -16,6 +16,11 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
     protected $_sConfigFile = 'marm_yamm.config.php';
 
     protected $_staticEntries = null;
+    
+    const ENABLED = 'aYAMMEnabledModules';
+    const DISABLED = 'aYAMMDisabledModules';
+    const CLASS_ORDER = 'aYAMMSpecialClassOrder';
+    const BLOCK_CONTROL = 'bYAMMBlockControl';
 
     private function handleConfigChanges()
     {
@@ -24,7 +29,7 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
         {
             include ($cache);
             $oModule = oxNew('oxModule');
-            $toActivate = array_diff($this->_staticEntries['aYAMMEnabledModules'], $aYAMMConfig['aYAMMEnabledModules']);
+            $toActivate = array_diff($this->_staticEntries[self::ENABLED], $aYAMMConfig[self::ENABLED]);
             foreach ( $toActivate as $id )
             {
                 $oModule->load($id);
@@ -32,9 +37,9 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
             }
             // @formatter:off
             $toDeactivate = array_diff(
-                $this->_staticEntries['aYAMMDisabledModules'],
-                $aYAMMConfig['aYAMMDisabledModules'],
-                $this->_staticEntries['aYAMMEnabledModules']
+                $this->_staticEntries[self::DISABLED],
+                $aYAMMConfig[self::DISABLED],
+                $this->_staticEntries[self::ENABLED]
             );
             // @formatter:on
             foreach ( $toDeactivate as $id )
@@ -50,6 +55,24 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
     {
         return array_keys($this->_staticEntries);
     }
+    
+    private function getOrderForClass($class)
+    {
+        $result = $this->_staticEntries[self::ENABLED];
+        if ( isset($this->_staticEntries[self::CLASS_ORDER]) )
+        {
+            if ( array_key_exists($class, $this->_staticEntries[self::CLASS_ORDER]) )
+            {
+                $result = array_merge(array_diff($result, $this->_staticEntries[self::CLASS_ORDER][$class]), $this->_staticEntries[self::CLASS_ORDER][$class]);
+            }
+        }
+        return $result;
+    }
+    
+    private function extendsForClass($class)
+    {
+        return array_key_exists($class, $this->_staticEntries['aModules']) ? $this->_staticEntries['aModules'][$class] : array();
+    }
 
     public function getModuleVar($sModuleVarName)
     {
@@ -64,33 +87,31 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
             {
                 $this->_staticEntries['aModules'][$key] = explode('&', $value);
             }
-            foreach ( $this->_staticEntries['aYAMMEnabledModules'] as $module )
+            
+            $moduleMeta = array();
+            foreach ( $this->_staticEntries[self::ENABLED] as $module )
             {
-                $metaPath = getShopBasePath() . 'modules/' . $this->_staticEntries['aModulePaths'][$module] . '/metadata.php';
-                include ($metaPath);
-                foreach ( $aModule['extend'] as $class => $path )
+                include(getShopBasePath() . '/modules/' . $this->_staticEntries['aModulePaths'][$module] . '/metadata.php');
+                $moduleMeta[$module] = $aModule;
+            }
+            
+            $extensions = array_map(function($meta) { return array_key_exists('extend', $meta) ? array_keys($meta['extend']) : array(); }, $moduleMeta);
+            $extensions = call_user_func_array(array_merge, array_values($extensions));
+            $extensions = array_unique($extensions);
+            
+            foreach ($extensions as $class)
+            {
+                $classes = array();
+                foreach ( $this->getOrderForClass($class) as $module )
                 {
-                    if ( isset($this->_staticEntries['aModules'][$class]) )
+                    if ( array_key_exists($class, $moduleMeta[$module]['extend']) )
                     {
-                        if ( in_array($path, $this->_staticEntries['aModules'][$class]) )
-                        {
-                            if ( !$this->_staticEntries['bYAMMRenice'] )
-                            {
-                                continue;
-                            }
-                            if ( ($key = array_search($path, $this->_staticEntries['aModules'][$class])) !== false )
-                            {
-                                unset($this->_staticEntries['aModules'][$class][$key]);
-                            }
-                        }
-                        $this->_staticEntries['aModules'][$class][] = $path;
-                    }
-                    else
-                    {
-                        $this->_staticEntries['aModules'][$class] = array($path);
+                        $classes[] = $moduleMeta[$module]['extend'][$class];
                     }
                 }
+                $this->_staticEntries['aModules'][$class] = array_merge(array_diff($this->extendsForClass($class), $classes), $classes);
             }
+            
             foreach ( $this->_staticEntries['aModules'] as $key => $value )
             {
                 $this->_staticEntries['aModules'][$key] = implode('&', $value);
@@ -105,9 +126,9 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
         		return array_diff(
         		  array_merge(
         		      parent::getModuleVar($sModuleVarName),
-        		      $this->_staticEntries['aYAMMDisabledModules']
+        		      $this->_staticEntries[self::DISABLED]
                   ),
-                  $this->_staticEntries['aYAMMEnabledModules']
+                  $this->_staticEntries[self::ENABLED]
                 );
                 // @formatter:on
             }
