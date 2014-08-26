@@ -91,7 +91,9 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
             $moduleMeta = array();
             foreach ( $this->_staticEntries[self::ENABLED] as $module )
             {
-                include(getShopBasePath() . '/modules/' . $this->_staticEntries['aModulePaths'][$module] . '/metadata.php');
+                $metaFile = getShopBasePath() . '/modules/' . $this->_staticEntries['aModulePaths'][$module] . '/metadata.php';
+                $aModule = array();
+                @include($metaFile);
                 $moduleMeta[$module] = $aModule;
             }
             
@@ -104,11 +106,12 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
                 $classes = array();
                 foreach ( $this->getOrderForClass($class) as $module )
                 {
-                    if ( array_key_exists($class, $moduleMeta[$module]['extend']) )
+                    if ( isset($moduleMeta[$module]['extend']) && array_key_exists($class, $moduleMeta[$module]['extend']) )
                     {
                         $classes[] = $moduleMeta[$module]['extend'][$class];
                     }
                 }
+
                 $this->_staticEntries['aModules'][$class] = array_merge(array_diff($this->extendsForClass($class), $classes), $classes);
             }
             

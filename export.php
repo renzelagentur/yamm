@@ -37,9 +37,14 @@ foreach (oxUtilsObject::getInstance()->getModuleVar('aModules') as $class => $cl
     $modules[$class] = array_unique(array_reverse(array_map(getModuleFromClassPath, $classes)));
 }
 
+$disabledModules = array_filter(oxUtilsObject::getInstance()->getModuleVar('aDisabledModules'), function($b) {
+    return $b != 'marm/yamm'; // yamm should never block itself
+});
+
 $flat = array();
 foreach ($modules as $key => $value) {
 	$value[] = $key;
+    $value = array_diff($value, $disabledModules);
     $flat[] = $value;
 }
 
@@ -73,9 +78,7 @@ for ($i = count($flat)-1; $i > -1; $i--) {
 
 $aYAMMConfig = array(
     'aYAMMEnabledModules' => array_unique($enabledModules),
-    'aYAMMDisabledModules' => array_filter(oxUtilsObject::getInstance()->getModuleVar('aDisabledModules'), function($b) {
-        return $b != 'marm/yamm'; // yamm should never block itself
-    }),
+    'aYAMMDisabledModules' => array_unique($disabledModules),
     'aYAMMSpecialClassOrder' => array(),
     'aModulePaths' => $modulePaths,
     'bYAMMBlockControl' => false,
