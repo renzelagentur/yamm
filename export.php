@@ -1,16 +1,22 @@
 <?php
 
+function getShopBasePath() {
+    return __DIR__ . '/../../../';
+}
+
 require_once __DIR__ . '/../../../bootstrap.php';
+
+// Check for admin when not on CLI
+if ( php_sapi_name() != 'cli' ) {
+        $user = oxNew('oxUser');
+        $user->loadAdminUser() || die('Access denied');
+}
 
 
 $modulePaths = array();
 foreach (oxRegistry::getConfig()->getConfigParam('aModulePaths') as $key => $value) {
 	if ($key)
         $modulePaths[$key] = $value;
-}
-
-function getShopBasePath() {
-    return __DIR__ . '/../../../';
 }
 
 function getModuleFromClassPath($class) {
@@ -111,8 +117,5 @@ $output = ob_get_clean();
 
 if ( php_sapi_name() == 'cli' )
     echo $output;
-else {
-    $user = oxNew('oxuser');
-    die($user->loadAdminUser() ? 'admin' : 'user');
+else
     highlight_string($output);
-}

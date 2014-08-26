@@ -86,9 +86,9 @@
 
 </div>
 
-[{ if !$aDeletedExt && $aExtClasses}]
+[{ if !$aDeletedExt && $aExtClasses && !$oView->YAMMBlocksControl() }]
     <div id="footerBox">
-        <div class="buttonsBox">
+        <div class="buttonBox">
             <form name="myedit" id="myedit" action="[{ $oViewConf->getSelfLink() }]" method="post">
                 [{ $oViewConf->getHiddenSid() }]
                 <input type="hidden" name="cl" value="module_sortlist">
@@ -97,13 +97,20 @@
                 <input type="hidden" name="aModules" value="">
                 <input type="button" name="saveButton" class="saveButton" value="[{ oxmultilang ident="GENERAL_SAVE" }]" disabled>
             </form>
+            <div class="description">
+                <p>[{ oxmultilang ident="MODULE_DRAGANDDROP" }]</p>
+            </div>
         </div>
-
-        <div class="description">
-            <p>
-                [{ oxmultilang ident="MODULE_DRAGANDDROP" }]
-
-            </p>
+        
+        [{oxscript include=$oViewConf->getModuleUrl('marm/yamm', 'out/admin/src/js/marm_yamm.js')}]
+        
+        <div class="buttonBox">
+            <div>
+                <button class="saveButton" data-base="[{$oViewConf->getModuleUrl('marm/yamm', 'export.php')}]" data-sid="[{$oView->getSessionId()}]" name="exportButton" id="yammExportButton">[{ oxmultilang ident="YAMM_EXPORT" }]</button>
+            </div>
+            <div class="description">
+                <p>[{ oxmultilang ident="YAMM_EXPORT_DESC" }]</p>
+            </div>
         </div>
     </div>
 [{/if}]

@@ -53,3 +53,13 @@
     border: 1px solid transparent;
     border-radius: 0;
 }
+
+#footerBox .buttonBox {
+    position: relative;
+    display: block;
+}
+
+#footerBox .buttonBox > * {
+    display: inline-block;
+    padding-left: inherit;
+}

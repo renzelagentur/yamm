@@ -25,5 +25,10 @@ class marm_yamm_module_sortlist extends marm_yamm_module_sortlist_parent
     {
         return oxUtilsObject::getInstance()->getModuleVar(marm_yamm_oxutilsobject::BLOCK_CONTROL);
     }
+    
+    public function getSessionId()
+    {
+        return oxConfig::getInstance()->getSession()->getId();
+    }
 
 }

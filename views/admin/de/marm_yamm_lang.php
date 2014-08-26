@@ -17,4 +17,6 @@ $aLang = array(
 	'MANUALLY_ACTIVATED' => 'Manuell Aktiviert',
 	'YAMM_ACTIVATED' => 'Von YAMM Aktiviert',
 	'YAMM_DISABLED' => 'Von YAMM Blockiert',
+    'YAMM_EXPORT' => 'Exportieren',
+    'YAMM_EXPORT_DESC' => 'Als YAMM-Konfiguration exportieren',
 );
