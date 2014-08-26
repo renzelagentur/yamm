@@ -89,9 +89,11 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
             }
             
             $moduleMeta = array();
+            $modulePathes = array_merge(parent::getModuleVar('aModulePaths'), isset($this->_staticEntries['aModulePaths']) ? $this->_staticEntries['aModulePaths'] : array());
             foreach ( $this->_staticEntries[self::ENABLED] as $module )
             {
-                $metaFile = getShopBasePath() . '/modules/' . $this->_staticEntries['aModulePaths'][$module] . '/metadata.php';
+                //$metaFile = getShopBasePath() . '/modules/' . $this->_staticEntries['aModulePaths'][$module] . '/metadata.php';
+                $metaFile = getShopBasePath() . '/modules/' . $modulePathes[$module] . '/metadata.php';
                 $aModule = array();
                 @include($metaFile);
                 $moduleMeta[$module] = $aModule;
