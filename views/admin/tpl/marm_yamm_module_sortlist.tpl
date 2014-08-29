@@ -106,7 +106,7 @@
         
         <div class="buttonBox">
             <div>
-                <button class="saveButton" data-base="[{$oViewConf->getModuleUrl('marm/yamm', 'export.php')}]" data-sid="[{$oView->getSessionId()}]" name="exportButton" id="yammExportButton">[{ oxmultilang ident="YAMM_EXPORT" }]</button>
+                <button class="saveButton" name="exportButton" id="yammExportButton">[{ oxmultilang ident="YAMM_EXPORT" }]</button>
             </div>
             <div class="description">
                 <p>[{ oxmultilang ident="YAMM_EXPORT_DESC" }]</p>

@@ -53,7 +53,7 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
 
     public function getYAMMKeys()
     {
-        return array_keys($this->_staticEntries);
+        return $this->_staticEntries ? array_keys($this->_staticEntries) : array();
     }
     
     private function getOrderForClass($class)
