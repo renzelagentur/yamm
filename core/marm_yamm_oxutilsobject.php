@@ -174,11 +174,4 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
         return $result;
     }
 
-    public function oxNew($sClassName)
-    {
-        error_log($sClassName);
-        $aArgs = func_get_args();
-        return call_user_func_array(array($this, 'parent::oxNew'), $aArgs);
-    }
-
 }
