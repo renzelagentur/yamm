@@ -22,5 +22,10 @@ class marm_yamm_oxmodule extends marm_yamm_oxmodule_parent
     {
         return in_array($this->getId(), oxUtilsObject::getInstance()->getModuleVar(marm_yamm_oxutilsobject::DISABLED));
     }
+    
+    public function hasX($x)
+    {
+        return isset($this->_aModule[$x]) && !empty($this->_aModule[$x]);
+    }
 
 }

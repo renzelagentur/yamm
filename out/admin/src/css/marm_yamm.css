@@ -44,6 +44,10 @@
     min-width: 17px;
 }
 
+#liste td.yamm_info .listitemfloating span:not(:last-child):after {
+    content: ',';
+}
+
 #aModulesList .sortable2.disabled li {
 	cursor: inherit;
 }

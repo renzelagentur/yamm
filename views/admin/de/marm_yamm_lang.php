@@ -14,9 +14,15 @@ $sLangName = 'Deutsch';
 
 $aLang = array(
 	'charset' => 'utf-8',
-	'MANUALLY_ACTIVATED' => 'Manuell Aktiviert',
-	'YAMM_ACTIVATED' => 'Von YAMM Aktiviert',
-	'YAMM_DISABLED' => 'Von YAMM Blockiert',
-    'YAMM_EXPORT' => 'Exportieren',
-    'YAMM_EXPORT_DESC' => 'Als YAMM-Konfiguration exportieren',
+	// Module List
+	'MANUALLY_ACTIVATED'        => 'Manuell Aktiviert',
+	'YAMM_ACTIVATED'            => 'Von YAMM Aktiviert',
+	'YAMM_DISABLED'             => 'Von YAMM Blockiert',
+	'YAMM_EXTENDED_CLASSES'     => 'Erweiterte Klassen',
+    'YAMM_FILES'                => 'PHP-Dateien',
+    'YAMM_TEMPLATES'            => 'Templates',
+    'YAMM_BLOCKS'               => 'Bl&ouml;cke',
+	// Extends List
+    'YAMM_EXPORT'               => 'Exportieren',
+    'YAMM_EXPORT_DESC'          => 'Als YAMM-Konfiguration exportieren',
 );

@@ -56,10 +56,18 @@ window.onload = function ()
 <table cellspacing="0" cellpadding="0" border="0" width="100%">
 <colgroup>
     <col width="3%">
-    <col width="98%">
+    <col width="30%">
+    <col width="10%">
+    <col width="58%">
 </colgroup>
 <tr class="listitem">
     <td valign="top" class="listfilter first" height="20">
+        <div class="r1"><div class="b1">&nbsp;</div></div>
+    </td>
+    <td valign="top" class="listfilter" height="20">
+        <div class="r1"><div class="b1">&nbsp;</div></div>
+    </td>
+    <td valign="top" class="listfilter" height="20">
         <div class="r1"><div class="b1">&nbsp;</div></div>
     </td>
     <td valign="top" class="listfilter" height="20">
@@ -72,6 +80,12 @@ window.onload = function ()
     </td>
     <td class="listheader" height="15">
         <b><a href="Javascript:document.search.sort.value='oxtitle';document.search.submit();" class="listheader">[{ oxmultilang ident="GENERAL_NAME" }]</a></b>
+    </td>
+    <td class="listheader" height="15">
+        <b><a href="Javascript:document.search.sort.value='oxtitle';document.search.submit();" class="listheader">[{ oxmultilang ident="MODULE_VERSION" }]</a></b>
+    </td>
+    <td class="listheader" height="15">
+        <b><a href="Javascript:document.search.sort.value='oxtitle';document.search.submit();" class="listheader">[{ oxmultilang ident="GENERAL_EXTRAINFO" }]</a></b>
     </td>
 </tr>
 [{foreach from=$mylist item=listitem}]
@@ -88,6 +102,19 @@ window.onload = function ()
     <td valign="top" class="[{$zebra}]" height="15">
         <div class="listitemfloating">
             <a href="Javascript:top.oxid.admin.editThis('[{ $listitem->getId() }]');" [{if $listitem->isFile() }]class="infoList"[{/if}]>[{ $listitem->getTitle() }]</a>
+        </div>
+    </td>
+    <td valign="top" class="[{$zebra}]" height="15">
+        <div class="listitemfloating">
+            <a href="Javascript:top.oxid.admin.editThis('[{ $listitem->getId() }]');" [{if $listitem->isFile() }]class="infoList"[{/if}]>[{ $listitem->getInfo('version')|default:'-' }]</a>
+        </div>
+    </td>
+    <td valign="top" class="[{$zebra}] yamm_info" height="15">
+        <div class="listitemfloating">
+            [{if $listitem->hasX('extend') }]<span>[{oxmultilang ident="YAMM_EXTENDED_CLASSES"}]</span>[{/if}]
+            [{if $listitem->hasX('files') }]<span>[{oxmultilang ident="YAMM_FILES"}]</span>[{/if}]
+            [{if $listitem->hasX('templates') }]<span>[{oxmultilang ident="YAMM_TEMPLATES"}]</span>[{/if}]
+            [{if $listitem->hasX('blocks') }]<span>[{oxmultilang ident="YAMM_BLOCKS"}]</span>[{/if}]
         </div>
     </td>
 </tr>
