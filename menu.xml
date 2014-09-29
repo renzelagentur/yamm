@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<OX>
+	<OXMENU id="NAVIGATION_ESHOPADMIN">
+		<MAINMENU id="mxextensions">
+			<SUBMENU id="mxmodule">
+				<TAB id="marm_yamm_module_metadata" cl="marm_yamm_module_metadata" />
+			</SUBMENU>
+		</MAINMENU>
+	</OXMENU>
+</OX>

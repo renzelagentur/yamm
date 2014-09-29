@@ -35,16 +35,18 @@ $aModule = array(
         'module_sortlist'	=> 'marm/yamm/core/marm_yamm_module_sortlist',
     ),
     'files' => array(
-		'marm_yamm_events' => 'marm/yamm/core/marm_yamm_events.php',
-		'marm_yamm_export' => 'marm/yamm/export.php',
+		'marm_yamm_events'            => 'marm/yamm/core/marm_yamm_events.php',
+		'marm_yamm_export'            => 'marm/yamm/export.php',
+		'marm_yamm_module_metadata'   => 'marm/yamm/core/marm_yamm_module_metadata.php',
 	),
     'templates' => array(
-        'marm_yamm_module_list.tpl' => 'marm/yamm/views/admin/tpl/marm_yamm_module_list.tpl',
-        'marm_yamm_module_main.tpl' => 'marm/yamm/views/admin/tpl/marm_yamm_module_main.tpl',
+        'marm_yamm_module_list.tpl'     => 'marm/yamm/views/admin/tpl/marm_yamm_module_list.tpl',
+        'marm_yamm_module_main.tpl'     => 'marm/yamm/views/admin/tpl/marm_yamm_module_main.tpl',
         'marm_yamm_module_sortlist.tpl' => 'marm/yamm/views/admin/tpl/marm_yamm_module_sortlist.tpl',
+        'marm_yamm_module_metadata.tpl' => 'marm/yamm/views/admin/tpl/marm_yamm_module_metadata.tpl',
     ),
 	'blocks' => array(
-		array( 'template' => 'headitem.tpl', 'block' => 'admin_headitem_inccss', 'file' => 'views/admin/blocks/marm_yamm_inccss.tpl'),
+		array('template' => 'headitem.tpl', 'block' => 'admin_headitem_inccss', 'file' => 'views/admin/blocks/marm_yamm_inccss.tpl'),
 	),
 	'events' => array(
 		'onActivate' => 'marm_yamm_events::activate',

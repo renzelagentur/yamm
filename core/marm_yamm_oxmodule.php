@@ -27,5 +27,10 @@ class marm_yamm_oxmodule extends marm_yamm_oxmodule_parent
     {
         return isset($this->_aModule[$x]) && !empty($this->_aModule[$x]);
     }
+    
+    public function getMetadata()
+    {
+        return $this->_aModule;
+    }
 
 }

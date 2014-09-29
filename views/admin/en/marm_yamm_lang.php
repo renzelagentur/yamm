@@ -15,14 +15,16 @@ $sLangName = 'English';
 $aLang = array(
 	'charset' => 'utf-8',
     // Module List
-	'MANUALLY_ACTIVATED'        => 'Activated manually',
-	'YAMM_ACTIVATED'            => 'Activated by YAMM',
-	'YAMM_DISABLED'             => 'Disabled by YAMM',
-    'YAMM_EXTENDED_CLASSES'     => 'extended classes',
-    'YAMM_FILES'                => 'PHP files',
-    'YAMM_TEMPLATES'            => 'templates',
-    'YAMM_BLOCKS'               => 'blocks',
+	'MANUALLY_ACTIVATED'           => 'Activated manually',
+	'YAMM_ACTIVATED'               => 'Activated by YAMM',
+	'YAMM_DISABLED'                => 'Disabled by YAMM',
+    'YAMM_EXTENDED_CLASSES'        => 'extended classes',
+    'YAMM_FILES'                   => 'PHP files',
+    'YAMM_TEMPLATES'               => 'templates',
+    'YAMM_BLOCKS'                  => 'blocks',
     // Extends List
-    'YAMM_EXPORT'               => 'Export',
-	'YAMM_EXPORT_DESC'          => 'Export as YAMM configuration',
+    'YAMM_EXPORT'                  => 'Export',
+	'YAMM_EXPORT_DESC'             => 'Export as YAMM configuration',
+	// Netadata tab
+	'marm_yamm_module_metadata'    => 'Metadata',
 );
