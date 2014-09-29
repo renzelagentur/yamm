@@ -119,7 +119,7 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
                 @include ($metaFile);
                 $moduleMeta[$module] = $aModule;
                 $this->_staticEntries['aModuleTemplates'][$module] = isset($aModule['templates']) ? $aModule['templates'] : null;
-                $this->_staticEntries['aModuleFiles'][$module] = isset($aModule['files']) ? $aModule['files'] : null;
+                $this->_staticEntries['aModuleFiles'][$module] = isset($aModule['files']) ? array_change_key_case($aModule['files'], CASE_LOWER) : null;
             }
 
             // @formatter:off
@@ -172,6 +172,13 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
         $result = parent::getModuleVar($sModuleVarName);
 
         return $result;
+    }
+
+    public function oxNew($sClassName)
+    {
+        error_log($sClassName);
+        $aArgs = func_get_args();
+        return call_user_func_array(array($this, 'parent::oxNew'), $aArgs);
     }
 
 }
