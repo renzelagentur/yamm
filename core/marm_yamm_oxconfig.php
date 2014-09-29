@@ -22,6 +22,7 @@ class marm_yamm_oxconfig extends marm_yamm_oxconfig_parent
         {
             return;
         }
+        oxUtilsObject::getInstance()->init();
         parent::init();
         foreach ( oxUtilsObject::getInstance()->getYAMMKeys() as $name )
         {

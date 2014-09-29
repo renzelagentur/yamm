@@ -36,6 +36,7 @@ $aModule = array(
     ),
     'files' => array(
 		'marm_yamm_events' => 'marm/yamm/core/marm_yamm_events.php',
+		'marm_yamm_export' => 'marm/yamm/export.php',
 	),
     'templates' => array(
         'marm_yamm_module_list.tpl' => 'marm/yamm/views/admin/tpl/marm_yamm_module_list.tpl',
