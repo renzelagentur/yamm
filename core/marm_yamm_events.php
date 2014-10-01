@@ -22,7 +22,7 @@ class marm_yamm_events
         if ( defined('MARM_YAMM_INFINITY_PREVENTION') )
             return;
         define('MARM_YAMM_INFINITY_PREVENTION', TRUE);
-        include (getShopBasePath() . $this->_sConfigFile);
+        /*include (getShopBasePath() . $this->_sConfigFile);
         $this->_staticEntries = $aYAMMConfig;
         $oModule = oxNew('oxModule');
         foreach ( $this->_staticEntries[marm_yamm_oxutilsobject::ENABLED] as $id )
@@ -44,7 +44,7 @@ class marm_yamm_events
             {
                 $oModule->deactivate();
             }
-        }
+        }*/
     }
 
     protected function deactivate()
