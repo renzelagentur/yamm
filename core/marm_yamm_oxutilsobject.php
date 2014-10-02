@@ -27,27 +27,31 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
         $oModule = oxNew('oxModule');
         if ( !$data )
             $data = array('metafiles' => array(), 'config' => array(self::ENABLED => array(), self::DISABLED => array(), ));
-        $toActivate = array();
+        $newlyActivated = array();
 
         if ( oxConfig::getInstance()->getShopConfVar('iLastModified', null, 'marm/yamm') < filemtime(getShopBasePath() . $this->_sConfigFile) ) {
 
-            $toActivate = array_diff($this->_staticEntries[self::ENABLED], $data['config'][self::ENABLED]);
-            foreach ($toActivate as $id) {
-                error_log("Activate {$id}");
+            foreach ($this->_staticEntries[self::ENABLED] as $id) {
                 $oModule->load($id);
-                $oModule->activate();
+                if ( !$oModule->isActive() ) {
+                    error_log("Activate {$id}");
+                    $oModule->activate();
+                    $newlyActivated[] = $id;
+                }
             }
+
             // @formatter:off
             $toDeactivate = array_diff(
                 $this->_staticEntries[self::DISABLED],
-                $data['config'][self::DISABLED],
                 $this->_staticEntries[self::ENABLED]
             );
             // @formatter:on
             foreach ($toDeactivate as $id) {
-                error_log("Deactivate {$id}");
                 $oModule->load($id);
-                $oModule->deactivate();
+                if ( $oModule->isActive() ) {
+                    error_log("Deactivate {$id}");
+                    $oModule->deactivate();
+                }
             }
         }
 
@@ -55,7 +59,7 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
         // Must be done to ensure that blocks are loaded, otherwise
         // some modules might break.
         foreach ($this->_staticEntries[self::ENABLED] as $id) {
-            if ( in_array($id, $toActivate) || $id == 'marm/yamm' )
+            if ( in_array($id, $newlyActivated) || $id == 'marm/yamm' )
                 continue;
             $metaFile = getShopBasePath() . '/modules/' . $modulePathes[$id] . '/metadata.php';
             if ( filemtime($metaFile) > $data['metafiles'][$id]['last_modified'] ) {
@@ -95,8 +99,8 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
     {
         return array_key_exists($class, $this->_staticEntries['aModules']) ? $this->_staticEntries['aModules'][$class] : array();
     }
-    
-    public function  init()
+
+    public function init()
     {
         if ( !isset($this->_staticEntries) && file_exists(getShopBasePath() . $this->_sConfigFile) ) {
             include (getShopBasePath() . $this->_sConfigFile);
@@ -107,7 +111,7 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
             $this->_staticEntries['aModules'] = parent::getModuleVar('aModules');
             $this->_staticEntries['aModuleFiles'] = parent::getModuleVar('aModuleFiles') ? parent::getModuleVar('aModuleFiles') : array();
             $this->_staticEntries['aModuleTemplates'] = parent::getModuleVar('aModuleTemplates') ? parent::getModuleVar('aModuleTemplates') : array();
-            
+
             foreach ($this->_staticEntries['aModules'] as $key => $value) {
                 $this->_staticEntries['aModules'][$key] = explode('&', $value);
             }
