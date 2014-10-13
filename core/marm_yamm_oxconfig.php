@@ -9,24 +9,21 @@
  * Author URI: http://www.marmalade.de
  */
 
-
 class marm_yamm_oxconfig extends marm_yamm_oxconfig_parent
 {
     protected $_sConfigFile = 'marm_yamm.config.php';
 
-    protected $_staticEntries = null;
+    protected $_blYAMMLoaded = false;
 
     public function init()
     {
-        if ( $this->_blInit )
-        {
-            return;
-        }
-        oxUtilsObject::getInstance()->init();
+        oxUtilsObject::getInstance()->initYAMM();
         parent::init();
-        foreach ( oxUtilsObject::getInstance()->getYAMMKeys() as $name )
-        {
-            $this->_aConfigParams[$name] = oxUtilsObject::getInstance()->getModuleVar($name);
+        if ( $this->_blYAMMLoaded === false ) {
+            foreach (oxUtilsObject::getInstance()->getYAMMKeys() as $name) {
+                $this->_aConfigParams[$name] = oxUtilsObject::getInstance()->getModuleVar($name);
+            }
+            $this->_blYAMMLoaded = True;
         }
     }
 

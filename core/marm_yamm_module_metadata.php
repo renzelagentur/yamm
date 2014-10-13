@@ -13,8 +13,8 @@ class marm_yamm_module_metadata extends oxAdminDetails
 {
     public function render()
     {
-        if ( oxConfig::getParameter("moduleId") ) {
-            $sModuleId = oxConfig::getParameter("moduleId");
+        if ( oxRegistry::getConfig()->getRequestParameter("moduleId") ) {
+            $sModuleId = oxRegistry::getConfig()->getRequestParameter("moduleId");
         } else {
             $sModuleId = $this->getEditObjectId();
         }

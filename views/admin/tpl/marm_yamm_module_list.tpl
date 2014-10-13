@@ -101,12 +101,12 @@ window.onload = function ()
     </td>
     <td valign="top" class="[{$zebra}]" height="15">
         <div class="listitemfloating">
-            <a href="Javascript:top.oxid.admin.editThis('[{ $listitem->getId() }]');" [{if $listitem->isFile() }]class="infoList"[{/if}]>[{ $listitem->getTitle() }]</a>
+            <a href="Javascript:top.oxid.admin.editThis('[{ $listitem->getId() }]');">[{ $listitem->getTitle() }]</a>
         </div>
     </td>
     <td valign="top" class="[{$zebra}]" height="15">
         <div class="listitemfloating">
-            <a href="Javascript:top.oxid.admin.editThis('[{ $listitem->getId() }]');" [{if $listitem->isFile() }]class="infoList"[{/if}]>[{ $listitem->getInfo('version')|default:'-' }]</a>
+            <a href="Javascript:top.oxid.admin.editThis('[{ $listitem->getId() }]');">[{ $listitem->getInfo('version')|default:'-' }]</a>
         </div>
     </td>
     <td valign="top" class="[{$zebra}] yamm_info" height="15">
