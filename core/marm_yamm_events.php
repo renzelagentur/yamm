@@ -19,8 +19,8 @@ class marm_yamm_events
     protected function deactivate()
     {
         define('MARM_YAMM_TURNED_OFF', TRUE);
-        oxConfig::getInstance()->saveShopConfVar('arr', 'aCachedConfig', null, null, 'marm/yamm');
-        oxConfig::getInstance()->saveShopConfVar('num', 'iLastModified', 0, null, 'marm/yamm');
+        oxRegistry::getConfig()->saveShopConfVar('arr', 'aCachedConfig', null, null, 'marm/yamm');
+        oxRegistry::getConfig()->saveShopConfVar('num', 'iLastModified', 0, null, 'marm/yamm');
     }
 
     public static function __callStatic($name, $arguments)

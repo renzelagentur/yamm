@@ -71,11 +71,11 @@
     <td width="260" valign="top">
         [{*assign var='_sError' value=$oModule->checkForActivationErrors()*}]
 
-        [{if ( $oModule->isFile() )}]
+        [{*if ( $oModule->isFile() )}]
         <div class="info">
             <div class="infoNotice"> [{ oxmultilang ident="MODULE_STANDALONEFILE" }]</div>
         </div>
-        [{/if}]
+        [{/if*}]
 
         [{if !$oModule->hasMetadata() && !$oModule->isRegistered()}]
         <div class="info">
