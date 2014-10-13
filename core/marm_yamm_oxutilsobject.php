@@ -21,29 +21,32 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
     const CLASS_ORDER = 'aYAMMSpecialClassOrder';
     const BLOCK_CONTROL = 'bYAMMBlockControl';
 
+    const CACHED_CONFIG = 'aYAMMCachedConfig';
+    const LAST_MODIFIED = 'iYAMMLastModified';
+
     private function activate($oModule, $method = 'activate')
     {
         if ( class_exists('oxModuleInstaller') )
-            oxNew('oxModuleInstaller')->$method($oModule);
+            oxRegistry::get('oxModuleInstaller')->$method($oModule);
         else
             $oModule->$method();
     }
 
     private function handleConfigChanges($modulePathes)
     {
-        $data = oxRegistry::getConfig()->getShopConfVar('aCachedConfig', null, 'marm/yamm');
+        $data = oxRegistry::getConfig()->getShopConfVar(self::CACHED_CONFIG, null, 'marm/yamm');
         $oModule = oxNew('oxModule');
         if ( !$data )
             $data = array('metafiles' => array(), 'config' => array(self::ENABLED => array(), self::DISABLED => array(), ));
         $newlyActivated = array();
 
-        if ( oxRegistry::getConfig()->getShopConfVar('iLastModified', null, 'marm/yamm') < filemtime(getShopBasePath() . $this->_sConfigFile) ) {
+        if ( oxRegistry::getConfig()->getShopConfVar(self::LAST_MODIFIED, null, 'marm/yamm') < filemtime(getShopBasePath() . $this->_sConfigFile) ) {
 
             foreach ($this->_staticEntries[self::ENABLED] as $id) {
                 $oModule->load($id);
                 if ( !$oModule->isActive() ) {
                     error_log("Activate {$id}");
-                    $this->activate($oModule); //$oModule->activate();
+                    $this->activate($oModule);
                     $newlyActivated[] = $id;
                 }
             }
@@ -58,7 +61,7 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
                 $oModule->load($id);
                 if ( $oModule->isActive() ) {
                     error_log("Deactivate {$id}");
-                    $this->activate($oModule, 'deactivate'); //$oModule->deactivate();
+                    $this->activate($oModule, 'deactivate');
                 }
             }
         }
@@ -73,8 +76,8 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
             if ( filemtime($metaFile) > $data['metafiles'][$id]['last_modified'] ) {
                 error_log("Reactivate {$id}");
                 $oModule->load($id);
-                $this->activate($oModule, 'deactivate'); //$oModule->deactivate();
-                $this->activate($oModule); //$oModule->activate();
+                $this->activate($oModule, 'deactivate');
+                $this->activate($oModule);
             }
         }
 
@@ -83,8 +86,8 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
             $metaFile = getShopBasePath() . '/modules/' . $modulePathes[$id] . '/metadata.php';
             $data['metafiles'][$id] = array('metafile' => $metaFile, 'last_modified' => filemtime($metaFile), );
         }
-        oxRegistry::getConfig()->saveShopConfVar('arr', 'aCachedConfig', $data, null, 'marm/yamm');
-        oxRegistry::getConfig()->saveShopConfVar('num', 'iLastModified', filemtime(getShopBasePath() . $this->_sConfigFile), null, 'marm/yamm');
+        oxRegistry::getConfig()->saveShopConfVar('arr', self::CACHED_CONFIG, $data, null, 'marm/yamm');
+        oxRegistry::getConfig()->saveShopConfVar('num', self::LAST_MODIFIED, filemtime(getShopBasePath() . $this->_sConfigFile), null, 'marm/yamm');
     }
 
     public function getYAMMKeys()
