@@ -40,11 +40,11 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
             $data = array('metafiles' => array(), 'config' => array(self::ENABLED => array(), self::DISABLED => array(), ));
         $newlyActivated = array();
 
-        if ( oxRegistry::getConfig()->getShopConfVar(self::LAST_MODIFIED, null, 'marm/yamm') < filemtime(getShopBasePath() . $this->_sConfigFile) ) {
+        if ( oxRegistry::getConfig()->getShopConfVar(self::LAST_MODIFIED, null, 'marm/yamm') < filemtime(getShopBasePath() . $this->_sConfigFile) || defined('MARM_YAMM_FORCE_RELOAD') ) {
 
             foreach ($this->_staticEntries[self::ENABLED] as $id) {
                 $oModule->load($id);
-                if ( !$oModule->isActive() ) {
+                if ( !$oModule->isActive() || defined('MARM_YAMM_FORCE_RELOAD') ) {
                     error_log("Activate {$id}");
                     $this->activate($oModule);
                     $newlyActivated[] = $id;
@@ -113,7 +113,7 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
 
     public function initYAMM()
     {
-        if ( !isset($this->_staticEntries) && file_exists(getShopBasePath() . $this->_sConfigFile) ) {
+        if ( !isset($this->_staticEntries) && file_exists(getShopBasePath() . $this->_sConfigFile) || defined('MARM_YAMM_FORCE_RELOAD') ) {
             include (getShopBasePath() . $this->_sConfigFile);
             $this->_staticEntries = $aYAMMConfig;
             // ["aModuleFiles","aModuleTemplates"]
