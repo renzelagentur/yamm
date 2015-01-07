@@ -26,25 +26,27 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
 
     private function activate($oModule, $method = 'activate')
     {
-        if ( class_exists('oxModuleInstaller') )
+        if ( class_exists('oxModuleInstaller') ) {
             oxRegistry::get('oxModuleInstaller')->$method($oModule);
-        else
+        } else {
             $oModule->$method();
+        }
     }
 
     private function handleConfigChanges($modulePathes)
     {
         $data = oxRegistry::getConfig()->getShopConfVar(self::CACHED_CONFIG, null, 'marm/yamm');
         $oModule = oxNew('oxModule');
-        if ( !$data )
+        if ( !$data ) {
             $data = array('metafiles' => array(), 'config' => array(self::ENABLED => array(), self::DISABLED => array(), ));
+        }
         $newlyActivated = array();
 
         if ( oxRegistry::getConfig()->getShopConfVar(self::LAST_MODIFIED, null, 'marm/yamm') < filemtime(getShopBasePath() . $this->_sConfigFile) || defined('MARM_YAMM_FORCE_RELOAD') ) {
 
             foreach ($this->_staticEntries[self::ENABLED] as $id) {
                 $oModule->load($id);
-                if ( !$oModule->isActive() || defined('MARM_YAMM_FORCE_RELOAD') ) {
+                if ( !$oModule->isActive() ) {
                     error_log("Activate {$id}");
                     $this->activate($oModule);
                     $newlyActivated[] = $id;
@@ -168,12 +170,12 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
         if ( isset($this->_staticEntries) && array_key_exists($sModuleVarName, $this->_staticEntries) ) {
             if ( $sModuleVarName === 'aDisabledModules' ) {
                 // @formatter:off
-        		return array_diff(
-        		  array_merge(
-        		      parent::getModuleVar($sModuleVarName),
-        		      $this->_staticEntries[self::DISABLED]
-                  ),
-                  $this->_staticEntries[self::ENABLED]
+                return array_diff(
+                    array_merge(
+                        parent::getModuleVar($sModuleVarName),
+                        $this->_staticEntries[self::DISABLED]
+                    ),
+                    $this->_staticEntries[self::ENABLED]
                 );
                 // @formatter:on
             } elseif ( is_array($this->_staticEntries[$sModuleVarName]) && parent::getModuleVar($sModuleVarName) ) {
