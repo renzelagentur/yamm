@@ -17,7 +17,8 @@ class marm_yamm_events
         define('MARM_YAMM_FORCE_RELOAD', TRUE);
         oxRegistry::getConfig()->saveShopConfVar('arr', 'aCachedConfig', null, null, 'marm/yamm');
         oxRegistry::getConfig()->saveShopConfVar('num', 'iLastModified', 0, null, 'marm/yamm');
-        oxRegistry::get('oxutilsobject')->initYAMM();
+        $oUtilsObject = oxNew('marm_yamm_oxutilsobject');
+        $oUtilsObject->initYAMM();
     }
 
     protected function deactivate()
