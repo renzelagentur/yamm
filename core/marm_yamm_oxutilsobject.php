@@ -60,10 +60,11 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
             );
             // @formatter:on
             foreach ($toDeactivate as $id) {
-                $oModule->load($id);
-                if ( $oModule->isActive() ) {
-                    error_log("Deactivate {$id}");
-                    $this->activate($oModule, 'deactivate');
+                if ( $oModule->load($id) ) {
+                    if ( $oModule->isActive() ) {
+                        error_log("Deactivate {$id}");
+                        $this->activate($oModule, 'deactivate');
+                    }
                 }
             }
         }
@@ -97,6 +98,11 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
         return isset($this->_staticEntries) ? array_keys($this->_staticEntries) : array();
     }
 
+    public function hasYAMMKey($key)
+    {
+        return isset($this->_staticEntries) && array_key_exists($key, $this->_staticEntries);
+    }
+
     private function getOrderForClass($class)
     {
         $result = $this->_staticEntries[self::ENABLED];
@@ -118,7 +124,6 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
         if ( !isset($this->_staticEntries) && file_exists(getShopBasePath() . $this->_sConfigFile) || defined('MARM_YAMM_FORCE_RELOAD') ) {
             include (getShopBasePath() . $this->_sConfigFile);
             $this->_staticEntries = $aYAMMConfig;
-            // ["aModuleFiles","aModuleTemplates"]
             $modulePathes = array_merge(parent::getModuleVar('aModulePaths'), isset($this->_staticEntries['aModulePaths']) ? $this->_staticEntries['aModulePaths'] : array());
             $this->handleConfigChanges($modulePathes);
             $this->_staticEntries['aModules'] = parent::getModuleVar('aModules');
@@ -170,7 +175,7 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
         if ( isset($this->_staticEntries) && array_key_exists($sModuleVarName, $this->_staticEntries) ) {
             if ( $sModuleVarName === 'aDisabledModules' ) {
                 // @formatter:off
-                return array_diff(
+                $result = array_diff(
                     array_merge(
                         parent::getModuleVar($sModuleVarName),
                         $this->_staticEntries[self::DISABLED]
@@ -181,12 +186,13 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
             } elseif ( is_array($this->_staticEntries[$sModuleVarName]) && parent::getModuleVar($sModuleVarName) ) {
                 $old = parent::getModuleVar($sModuleVarName);
                 $new = $this->_staticEntries[$sModuleVarName];
-                return ($new == $old) ? $new : array_merge($old, $new);
+                $result = ($new == $old) ? $new : array_merge($old, $new);
             } else {
-                return $this->_staticEntries[$sModuleVarName];
+                $result = $this->_staticEntries[$sModuleVarName];
             }
+        } else {
+            $result = parent::getModuleVar($sModuleVarName);
         }
-        $result = parent::getModuleVar($sModuleVarName);
 
         return $result;
     }

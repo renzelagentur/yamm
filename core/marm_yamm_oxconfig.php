@@ -11,20 +11,20 @@
 
 class marm_yamm_oxconfig extends marm_yamm_oxconfig_parent
 {
-    protected $_sConfigFile = 'marm_yamm.config.php';
-
-    protected $_blYAMMLoaded = false;
-
     public function init()
     {
         oxUtilsObject::getInstance()->initYAMM();
         parent::init();
-        if ( $this->_blYAMMLoaded === false ) {
-            foreach (oxUtilsObject::getInstance()->getYAMMKeys() as $name) {
-                $this->_aConfigParams[$name] = oxUtilsObject::getInstance()->getModuleVar($name);
-            }
-            $this->_blYAMMLoaded = True;
+    }
+
+    public function getConfigParam($sName)
+    {
+        $mValue = parent::getConfigParam($sName);
+        $oUtils = oxUtilsObject::getInstance();
+        if ( $oUtils->hasYAMMKey($sName) ) {
+            $mValue = $oUtils->getModuleVar($sName);
         }
+        return $mValue;
     }
 
 }
