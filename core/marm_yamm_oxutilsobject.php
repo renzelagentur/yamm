@@ -60,10 +60,11 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
             );
             // @formatter:on
             foreach ($toDeactivate as $id) {
-                $oModule->load($id);
-                if ( $oModule->isActive() ) {
-                    error_log("Deactivate {$id}");
-                    $this->activate($oModule, 'deactivate');
+                if ( $oModule->load($id) ) {
+                    if ( $oModule->isActive() ) {
+                        error_log("Deactivate {$id}");
+                        $this->activate($oModule, 'deactivate');
+                    }
                 }
             }
         }
@@ -96,7 +97,7 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
     {
         return isset($this->_staticEntries) ? array_keys($this->_staticEntries) : array();
     }
-    
+
     public function hasYAMMKey($key)
     {
         return isset($this->_staticEntries) && array_key_exists($key, $this->_staticEntries);
