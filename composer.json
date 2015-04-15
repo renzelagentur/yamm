@@ -1,0 +1,23 @@
+{
+    "name": "yamm/yamm",
+    "description": "Yet another meta module",
+    "license": "MIT",
+    "type": "oxid-module",
+    "authors": [
+	{
+            "name": "Joscha Krug",
+            "email": "krug@marmalade.de"
+	},
+        {
+            "name": "Jens Richter"
+        },
+        {
+            "name": "Benjamin Kleiner"
+        },
+        {
+            "name": "Christian Loock",
+            "email": "chl@vkf-renzel.de"
+        }
+    ],
+    "require": {}
+}
