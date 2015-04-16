@@ -102,7 +102,7 @@
             </div>
         </div>
         
-        [{oxscript include=$oViewConf->getModuleUrl('marm/yamm', 'out/admin/src/js/marm_yamm.js')}]
+        [{oxscript include=$oViewConf->getModuleUrl('yamm/yamm', 'out/admin/src/js/yamm.js')}]
         
         <div class="buttonBox">
             <div>

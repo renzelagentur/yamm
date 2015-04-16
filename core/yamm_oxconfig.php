@@ -1,15 +1,15 @@
 <?php
 /**
- * This file is part of a marmalade GmbH project
+ * This file is part of a yammalade GmbH project
  *
  * It is Open Source and may be redistributed.
- * For contact information please visit http://www.marmalade.de
+ * For contact information please visit http://www.yammalade.de
  *
  * Version:    1.0
- * Author URI: http://www.marmalade.de
+ * Author URI: http://www.yammalade.de
  */
 
-class marm_yamm_oxconfig extends marm_yamm_oxconfig_parent
+class yamm_oxconfig extends yamm_oxconfig_parent
 {
     public function init()
     {

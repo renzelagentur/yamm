@@ -1,28 +1,36 @@
 <?php
 /**
- * This file is part of a marmalade GmbH project
+ * This file is part of a yammalade GmbH project
  *
  * It is Open Source and may be redistributed.
- * For contact information please visit http://www.marmalade.de
+ * For contact information please visit http://www.yammalade.de
  *
  * Version:    1.0
- * Author URI: http://www.marmalade.de
+ * Author URI: http://www.yammalade.de
  */
 
-class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
+class yamm_oxutilsobject extends yamm_oxutilsobject_parent
 {
 
-    protected $_sConfigFile = 'marm_yamm.config.php';
+    protected $_sConfigFile = 'yamm.config.php';
 
     protected $_staticEntries = null;
 
     const ENABLED = 'aYAMMEnabledModules';
+
     const DISABLED = 'aYAMMDisabledModules';
+
     const CLASS_ORDER = 'aYAMMSpecialClassOrder';
+
     const BLOCK_CONTROL = 'bYAMMBlockControl';
 
     const CACHED_CONFIG = 'aYAMMCachedConfig';
+
     const LAST_MODIFIED = 'iYAMMLastModified';
+
+    private $bMultiShop;
+
+    private $sYAMMConfigFile;
 
     private function activate($oModule, $method = 'activate')
     {
@@ -33,16 +41,16 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
         }
     }
 
-    private function handleConfigChanges($modulePathes)
+    private function handleConfigChanges($modulePaths)
     {
-        $data = oxRegistry::getConfig()->getShopConfVar(self::CACHED_CONFIG, null, 'marm/yamm');
+        $data = oxRegistry::getConfig()->getShopConfVar(self::CACHED_CONFIG, null, 'yamm/yamm');
         $oModule = oxNew('oxModule');
         if ( !$data ) {
             $data = array('metafiles' => array(), 'config' => array(self::ENABLED => array(), self::DISABLED => array(), ));
         }
         $newlyActivated = array();
 
-        if ( oxRegistry::getConfig()->getShopConfVar(self::LAST_MODIFIED, null, 'marm/yamm') < filemtime(getShopBasePath() . $this->_sConfigFile) || defined('MARM_YAMM_FORCE_RELOAD') ) {
+        if ( oxRegistry::getConfig()->getShopConfVar(self::LAST_MODIFIED, null, 'yamm/yamm') < filemtime($this->sYAMMConfigFile) || defined('YAMM_FORCE_RELOAD') ) {
 
             foreach ($this->_staticEntries[self::ENABLED] as $id) {
                 $oModule->load($id);
@@ -73,9 +81,10 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
         // Must be done to ensure that blocks are loaded, otherwise
         // some modules might break.
         foreach ($this->_staticEntries[self::ENABLED] as $id) {
-            if ( in_array($id, $newlyActivated) || $id == 'marm/yamm' )
+            if ( in_array($id, $newlyActivated) || $id == 'yamm/yamm' )
                 continue;
-            $metaFile = getShopBasePath() . '/modules/' . $modulePathes[$id] . '/metadata.php';
+
+            $metaFile = rtrim(getShopBasePath(), '/') . '/modules/' . $modulePaths[$id] . '/metadata.php';
             if ( filemtime($metaFile) > $data['metafiles'][$id]['last_modified'] ) {
                 error_log("Reactivate {$id}");
                 $oModule->load($id);
@@ -86,11 +95,11 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
 
         $data = array('config' => $this->_staticEntries, 'metafiles' => array(), );
         foreach ($this->_staticEntries[self::ENABLED] as $id) {
-            $metaFile = getShopBasePath() . '/modules/' . $modulePathes[$id] . '/metadata.php';
+            $metaFile = rtrim(getShopBasePath(), '/') . '/modules/' . $modulePaths[$id] . '/metadata.php';
             $data['metafiles'][$id] = array('metafile' => $metaFile, 'last_modified' => filemtime($metaFile), );
         }
-        oxRegistry::getConfig()->saveShopConfVar('arr', self::CACHED_CONFIG, $data, null, 'marm/yamm');
-        oxRegistry::getConfig()->saveShopConfVar('num', self::LAST_MODIFIED, filemtime(getShopBasePath() . $this->_sConfigFile), null, 'marm/yamm');
+        oxRegistry::getConfig()->saveShopConfVar('arr', self::CACHED_CONFIG, $data, null, 'yamm/yamm');
+        oxRegistry::getConfig()->saveShopConfVar('num', self::LAST_MODIFIED, filemtime($this->sYAMMConfigFile), null, 'yamm/yamm');
     }
 
     public function getYAMMKeys()
@@ -121,11 +130,21 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
 
     public function initYAMM()
     {
-        if ( !isset($this->_staticEntries) && file_exists(getShopBasePath() . $this->_sConfigFile) || defined('MARM_YAMM_FORCE_RELOAD') ) {
-            include (getShopBasePath() . $this->_sConfigFile);
+
+        $sConfigPath = rtrim(getShopBasePath(), '/') . '/YAMM';
+
+        $this->bMultiShop = oxRegistry::getConfig()->getShopId() !== 'oxbaseshop';
+        if ($this->bMultiShop) {
+            $sConfigPath .= '/' . oxRegistry::getConfig()->getShopId();
+        }
+
+        $this->sYAMMConfigFile = $sConfigPath . '/' . $this->_sConfigFile;
+
+        if ( !isset($this->_staticEntries) && file_exists($this->sYAMMConfigFile) || defined('YAMM_FORCE_RELOAD') ) {
+            include ($this->sYAMMConfigFile);
             $this->_staticEntries = $aYAMMConfig;
-            $modulePathes = array_merge(parent::getModuleVar('aModulePaths'), isset($this->_staticEntries['aModulePaths']) ? $this->_staticEntries['aModulePaths'] : array());
-            $this->handleConfigChanges($modulePathes);
+            $modulePaths = array_merge(parent::getModuleVar('aModulePaths'), isset($this->_staticEntries['aModulePaths']) ? $this->_staticEntries['aModulePaths'] : array());
+            $this->handleConfigChanges($modulePaths);
             $this->_staticEntries['aModules'] = parent::getModuleVar('aModules');
             $this->_staticEntries['aModuleFiles'] = parent::getModuleVar('aModuleFiles') ? parent::getModuleVar('aModuleFiles') : array();
             $this->_staticEntries['aModuleTemplates'] = parent::getModuleVar('aModuleTemplates') ? parent::getModuleVar('aModuleTemplates') : array();
@@ -136,7 +155,7 @@ class marm_yamm_oxutilsobject extends marm_yamm_oxutilsobject_parent
 
             $moduleMeta = array();
             foreach ($this->_staticEntries[self::ENABLED] as $module) {
-                $metaFile = getShopBasePath() . '/modules/' . $modulePathes[$module] . '/metadata.php';
+                $metaFile = getShopBasePath() . '/modules/' . $modulePaths[$module] . '/metadata.php';
                 $aModule = array();
                 @include ($metaFile);
                 $moduleMeta[$module] = $aModule;

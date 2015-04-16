@@ -1,12 +1,12 @@
 <?php
 /**
- * This file is part of a marmalade GmbH project
+ * This file is part of a yammalade GmbH project
  *
  * It is Open Source and may be redistributed.
- * For contact information please visit http://www.marmalade.de
+ * For contact information please visit http://www.yammalade.de
  *
  * Version:    1.0
- * Author URI: http://www.marmalade.de
+ * Author URI: http://www.yammalade.de
  */
 
 
@@ -26,5 +26,5 @@ $aLang = array(
     'YAMM_EXPORT'                   => 'Exportieren',
     'YAMM_EXPORT_DESC'              => 'Als YAMM-Konfiguration exportieren',
     // Netadata tab
-    'marm_yamm_module_metadata'     => 'Metadaten',
+    'yamm_module_metadata'     => 'Metadaten',
 );

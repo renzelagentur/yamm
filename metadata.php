@@ -1,12 +1,12 @@
 <?php
 /**
- * This file is part of a marmalade GmbH project
+ * This file is part of a yammalade GmbH project
  *
  * It is Open Source and may be redistributed.
- * For contact information please visit http://www.marmalade.de
+ * For contact information please visit http://www.yammalade.de
  *
  * Version:    1.0
- * Author URI: http://www.marmalade.de
+ * Author URI: http://www.yammalade.de
  */
 
 /**
@@ -18,38 +18,37 @@ $sMetadataVersion = '1.1';
  * Module information
  */
 $aModule = array(
-    'id'            => 'marm/yamm',
-    'title'         => ' -> marmalade :: YAMM',
+    'id'            => 'yamm/yamm',
+    'title'         => ':: YAMM',
     'description'   => 'Yet another meta module',
-    'thumbnail'     => 'marmalade.jpg',
+    'thumbnail'     => 'yamm.jpg',
     'version'       => '1.0',
-    'author'        => 'marmalade GmbH',
-    'email'         => 'support@marmalade.de',
-    'url'           => 'http://www.marmalade.de',
+    'author'        => 'YAMM Contributors',
+    'url'           => 'https://github.com/yammaladeDE/yamm',
     'extend'        => array(
-        'oxconfig'          => 'marm/yamm/core/marm_yamm_oxconfig',
-        'oxutilsobject'     => 'marm/yamm/core/marm_yamm_oxutilsobject',
-        'oxmodule'			=> 'marm/yamm/core/marm_yamm_oxmodule',
-        'module_list'		=> 'marm/yamm/core/marm_yamm_module_list',
-        'module_main'		=> 'marm/yamm/core/marm_yamm_module_main',
-        'module_sortlist'	=> 'marm/yamm/core/marm_yamm_module_sortlist',
+        'oxconfig'          => 'yamm/yamm/core/yamm_oxconfig',
+        'oxutilsobject'     => 'yamm/yamm/core/yamm_oxutilsobject',
+        'oxmodule'			=> 'yamm/yamm/core/yamm_oxmodule',
+        'module_list'		=> 'yamm/yamm/core/yamm_module_list',
+        'module_main'		=> 'yamm/yamm/core/yamm_module_main',
+        'module_sortlist'	=> 'yamm/yamm/core/yamm_module_sortlist',
     ),
     'files' => array(
-		'marm_yamm_events'            => 'marm/yamm/core/marm_yamm_events.php',
-		'marm_yamm_export'            => 'marm/yamm/export.php',
-		'marm_yamm_module_metadata'   => 'marm/yamm/core/marm_yamm_module_metadata.php',
+		'yamm_events'            => 'yamm/yamm/core/yamm_events.php',
+		'yamm_export'            => 'yamm/yamm/export.php',
+		'yamm_module_metadata'   => 'yamm/yamm/core/yamm_module_metadata.php',
 	),
     'templates' => array(
-        'marm_yamm_module_list.tpl'     => 'marm/yamm/views/admin/tpl/marm_yamm_module_list.tpl',
-        'marm_yamm_module_main.tpl'     => 'marm/yamm/views/admin/tpl/marm_yamm_module_main.tpl',
-        'marm_yamm_module_sortlist.tpl' => 'marm/yamm/views/admin/tpl/marm_yamm_module_sortlist.tpl',
-        'marm_yamm_module_metadata.tpl' => 'marm/yamm/views/admin/tpl/marm_yamm_module_metadata.tpl',
+        'yamm_module_list.tpl'     => 'yamm/yamm/views/admin/tpl/yamm_module_list.tpl',
+        'yamm_module_main.tpl'     => 'yamm/yamm/views/admin/tpl/yamm_module_main.tpl',
+        'yamm_module_sortlist.tpl' => 'yamm/yamm/views/admin/tpl/yamm_module_sortlist.tpl',
+        'yamm_module_metadata.tpl' => 'yamm/yamm/views/admin/tpl/yamm_module_metadata.tpl',
     ),
 	'blocks' => array(
-		array('template' => 'headitem.tpl', 'block' => 'admin_headitem_inccss', 'file' => 'views/admin/blocks/marm_yamm_inccss.tpl'),
+		array('template' => 'headitem.tpl', 'block' => 'admin_headitem_inccss', 'file' => 'views/admin/blocks/yamm_inccss.tpl'),
 	),
 	'events' => array(
-		'onActivate' => 'marm_yamm_events::activate',
-		'onDeactivate' => 'marm_yamm_events::deactivate',
+		'onActivate' => 'yamm_events::activate',
+		'onDeactivate' => 'yamm_events::deactivate',
 	),
 ); 

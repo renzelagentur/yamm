@@ -1,29 +1,29 @@
 <?php
 /**
- * This file is part of a marmalade GmbH project
+ * This file is part of a yammalade GmbH project
  *
  * It is Open Source and may be redistributed.
- * For contact information please visit http://www.marmalade.de
+ * For contact information please visit http://www.yammalade.de
  *
  * Version:    1.0
- * Author URI: http://www.marmalade.de
+ * Author URI: http://www.yammalade.de
  */
 
 
-class marm_yamm_module_sortlist extends marm_yamm_module_sortlist_parent
+class yamm_module_sortlist extends yamm_module_sortlist_parent
 {
 
     public function render()
     {
         $x = parent::render();
-        if ( defined('MARM_YAMM_TURNED_OFF') )
+        if ( defined('YAMM_TURNED_OFF') )
             return $x;
-        return 'marm_yamm_module_sortlist.tpl';
+        return 'yamm_module_sortlist.tpl';
     }
 
     public function YAMMBlocksControl()
     {
-        return oxUtilsObject::getInstance()->getModuleVar(marm_yamm_oxutilsobject::BLOCK_CONTROL);
+        return oxUtilsObject::getInstance()->getModuleVar(yamm_oxutilsobject::BLOCK_CONTROL);
     }
     
     public function export()
@@ -42,7 +42,7 @@ class marm_yamm_module_sortlist extends marm_yamm_module_sortlist_parent
         };
         
         function noYAMM($b) {
-            return $b != 'marm/yamm'; // yamm should never block or activate itself
+            return $b != 'yamm/yamm'; // yamm should never block or activate itself
         }
         
         function deClass($a) {
@@ -106,7 +106,7 @@ class marm_yamm_module_sortlist extends marm_yamm_module_sortlist_parent
         // check for non-extending modules, and those which where never switched on...
         $module = oxNew('oxModule');
         foreach ($modulePaths as $id => $path) {
-            if (in_array($id, $aYAMMConfig['aYAMMEnabledModules']) || in_array($id, $aYAMMConfig['aYAMMDisabledModules']) || $id == 'marm/yamm')
+            if (in_array($id, $aYAMMConfig['aYAMMEnabledModules']) || in_array($id, $aYAMMConfig['aYAMMDisabledModules']) || $id == 'yamm/yamm')
                 continue;
             $module->load($id);
             if ($module->isActive())

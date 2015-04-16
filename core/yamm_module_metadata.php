@@ -1,15 +1,15 @@
 <?php
 /**
- * This file is part of a marmalade GmbH project
+ * This file is part of a yammalade GmbH project
  *
  * It is Open Source and may be redistributed.
- * For contact information please visit http://www.marmalade.de
+ * For contact information please visit http://www.yammalade.de
  *
  * Version:    1.0
- * Author URI: http://www.marmalade.de
+ * Author URI: http://www.yammalade.de
  */
 
-class marm_yamm_module_metadata extends oxAdminDetails
+class yamm_module_metadata extends oxAdminDetails
 {
     public function render()
     {
@@ -32,7 +32,7 @@ class marm_yamm_module_metadata extends oxAdminDetails
         }
 
         parent::render();
-        return 'marm_yamm_module_metadata.tpl';
+        return 'yamm_module_metadata.tpl';
     }
 
 }

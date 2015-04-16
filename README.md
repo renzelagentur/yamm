@@ -1,4 +1,4 @@
-marmalade :: YAMM
+YAMM
 =================
 Yet another metamodule, like you know it from D3 and many others.
 
@@ -14,12 +14,21 @@ Feature Requests
  * Module dependencies checking
  * Dependency injection container
 
-How to use
+Installation
 ----------
- 1. Place the whole module in your shop in `modules/marm/`
- 2. Create a file "vendormetadata.php" in `modules/marm/`
+
+Via Composer:
+ 1. Add yamm/yamm to your composer.json's require section
+ 2. Run `composer update`
+ 3. Create a file "vendormetadata.php" in `modules/yamm/`
+ 4. Create a file `marm_yamm.config.php` in OXiDs root directory. See Section _Config File_ for further information.
+ 5. Activate the modul.
+  
+Manual:
+ 1. Place the whole module in your shop in `modules/yamm/`
+ 2. Create a file "vendormetadata.php" in `modules/yamm/`
  3. Create a file `marm_yamm.config.php` in OXiDs root directory. See Section _Config File_ for further information.
- 3. Activate the modul.
+ 4. Activate the modul.
 
 Config File
 -----------
