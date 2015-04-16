@@ -147,7 +147,9 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
 
         $this->bMultiShop = oxRegistry::getConfig()->getShopId() !== 'oxbaseshop';
         if ($this->bMultiShop) {
-            $sConfigPath .= '/' . oxRegistry::getConfig()->getShopId();
+            if (is_dir($sConfigPath . '/' . oxRegistry::getConfig()->getShopId())) {
+                $sConfigPath .= '/' . oxRegistry::getConfig()->getShopId();
+            }
         }
 
         $this->sYAMMConfigFile = $sConfigPath . '/' . $this->_sConfigFile;
