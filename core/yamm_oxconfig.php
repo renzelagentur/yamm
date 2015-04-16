@@ -11,9 +11,15 @@
 
 class yamm_oxconfig extends yamm_oxconfig_parent
 {
+
+    private $bYammCalled = false;
+
     public function init()
     {
-        oxUtilsObject::getInstance()->initYAMM();
+        if (!$this->bYammCalled) {
+            $this->bYammCalled = true;
+            oxUtilsObject::getInstance()->initYAMM();
+        }
         parent::init();
     }
 

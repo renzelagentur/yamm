@@ -32,6 +32,8 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
 
     private $sYAMMConfigFile;
 
+    private $sYAMMContext;
+
     private function activate($oModule, $method = 'activate')
     {
         if ( class_exists('oxModuleInstaller') ) {
@@ -132,6 +134,16 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
     {
 
         $sConfigPath = rtrim(getShopBasePath(), '/') . '/YAMM';
+
+        if (oxRegistry::getConfig()->getShopConfVar('sYAMMContext') !== null) {
+            $this->sYAMMContext = oxRegistry::getConfig()->getShopConfVar('sYAMMContext');
+        } else {
+            $this->sYAMMContext = 'production';
+        }
+
+        if (is_dir($sConfigPath . '/' . $this->sYAMMContext)) {
+            $sConfigPath .= '/' . $this->sYAMMContext;
+        }
 
         $this->bMultiShop = oxRegistry::getConfig()->getShopId() !== 'oxbaseshop';
         if ($this->bMultiShop) {
