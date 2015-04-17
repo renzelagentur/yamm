@@ -154,7 +154,7 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
 
         $this->sYAMMConfigFile = $sConfigPath . '/' . $this->_sConfigFile;
 
-        if ( !isset($this->_staticEntries) && file_exists($this->sYAMMConfigFile) || defined('YAMM_FORCE_RELOAD') ) {
+        if (file_exists($this->sYAMMConfigFile) && (!isset($this->_staticEntries) || defined('YAMM_FORCE_RELOAD')) ) {
             include ($this->sYAMMConfigFile);
             $this->_staticEntries = $aYAMMConfig;
             $modulePaths = array_merge(parent::getModuleVar('aModulePaths'), isset($this->_staticEntries['aModulePaths']) ? $this->_staticEntries['aModulePaths'] : array());
