@@ -90,8 +90,36 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
             if ( filemtime($metaFile) > $data['metafiles'][$id]['last_modified'] ) {
                 error_log("Reactivate {$id}");
                 $oModule->load($id);
+
+                // Since 4.9/EE5.2 Module Configs are deleted, when you deactivate a module,
+                // this is why we temporarly backup the config to restore it again after activation
+                $sQuery   = sprintf(
+                    'SELECT OXID, OXSHOPID, OXMODULE, OXVARNAME, OXVARTYPE, DECODE(oxvarvalue, "%s") as OXVARVALUE FROM oxconfig WHERE OXSHOPID = "%s" AND OXMODULE = "module:%s"',
+                    oxRegistry::getConfig()->getConfigParam('sConfigKey'),
+                    oxRegistry::getConfig()->getShopId(),
+                    $id
+                );
+                $aResult = oxDb::getDb()->getArray($sQuery);
+
                 $this->activate($oModule, 'deactivate');
                 $this->activate($oModule);
+
+                foreach ($aResult as $aRow) {
+                    if ($aRow[3] != 'noConfigHere') {
+                        $sQuery   = sprintf(
+                            'INSERT INTO oxconfig SET OXID= %s, OXSHOPID = %s, OXMODULE = %s,OXVARNAME = %s, OXVARTYPE = %s, OXVARVALUE =ENCODE(%s, %s);',
+                            oxDb::getDb()->qstr($aRow[0]),
+                            oxDb::getDb()->qstr($aRow[1]),
+                            oxDb::getDb()->qstr($aRow[2]),
+                            oxDb::getDb()->qstr($aRow[3]),
+                            oxDb::getDb()->qstr($aRow[4]),
+                            oxDb::getDb()->qstr($aRow[5]),
+                            oxDb::getDb()->qstr(oxRegistry::getConfig()->getConfigParam('sConfigKey'))
+                        );
+
+                        oxDb::getDb()->query($sQuery);
+                    }
+                }
             }
         }
 
@@ -132,6 +160,12 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
 
     public function initYAMM()
     {
+
+        if ($this->_bInitCalled) {
+            return;
+        } else {
+            $this->_bInitCalled = true;
+        }
 
         $sConfigPath = rtrim(getShopBasePath(), '/') . '/YAMM';
 
@@ -179,8 +213,8 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
 
             // @formatter:off
             $extensions = array_map(function($meta) {
-                return array_key_exists('extend', $meta) ? array_keys($meta['extend']) : array();
-            }, $moduleMeta);
+                    return array_key_exists('extend', $meta) ? array_keys($meta['extend']) : array();
+                }, $moduleMeta);
             // @formatter:on
             $extensions = call_user_func_array(array_merge, array_values($extensions));
             $extensions = array_unique($extensions);
@@ -204,6 +238,9 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
 
     public function getModuleVar($sModuleVarName)
     {
+        if ($this->_staticEntries === NULL) {
+            $this->initYAMM();
+        }
 
         if ( isset($this->_staticEntries) && array_key_exists($sModuleVarName, $this->_staticEntries) ) {
             if ( $sModuleVarName === 'aDisabledModules' ) {
