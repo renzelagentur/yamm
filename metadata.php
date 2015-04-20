@@ -1,12 +1,12 @@
 <?php
 /**
- * This file is part of a yammalade GmbH project
+ * This file is part of a marmalade GmbH project
  *
  * It is Open Source and may be redistributed.
- * For contact information please visit http://www.yammalade.de
+ * For contact information please visit http://www.marmalade.de
  *
  * Version:    1.0
- * Author URI: http://www.yammalade.de
+ * Author URI: http://www.marmalade.de
  */
 
 /**
@@ -20,11 +20,10 @@ $sMetadataVersion = '1.1';
 $aModule = array(
     'id'            => 'yamm/yamm',
     'title'         => ':: YAMM',
-    'description'   => 'Yet another meta module',
-    'thumbnail'     => 'yamm.jpg',
-    'version'       => '1.0',
-    'author'        => 'YAMM Contributors',
-    'url'           => 'https://github.com/yammaladeDE/yamm',
+    'description'   => 'Yet another meta module -  Oxid Module Management Extension',
+    'version'       => '1.1',
+    'author'        => 'marmalde GmbH & YAMM Contributors',
+    'url'           => 'https://github.com/marmaladeDE/yammm',
     'extend'        => array(
         'oxconfig'          => 'yamm/yamm/core/yamm_oxconfig',
         'oxutilsobject'     => 'yamm/yamm/core/yamm_oxutilsobject',

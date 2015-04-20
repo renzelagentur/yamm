@@ -4,10 +4,10 @@
     "license": "MIT",
     "type": "oxid-module",
     "authors": [
-	{
-            "name": "Joscha Krug",
-            "email": "krug@marmalade.de"
-	},
+        {
+                "name": "Joscha Krug",
+                "email": "krug@marmalade.de"
+        },
         {
             "name": "Jens Richter"
         },
