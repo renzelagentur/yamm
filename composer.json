@@ -19,5 +19,10 @@
             "email": "chl@vkf-renzel.de"
         }
     ],
-    "require": {}
+    "require": {
+
+    },
+    "autoload": {
+        "classmap": ["core/", "services/", "command/"]
+    }
 }
