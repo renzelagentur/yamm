@@ -23,6 +23,6 @@
 
     },
     "autoload": {
-        "classmap": ["core/", "services/", "command/"]
+        "classmap": ["core/"]
     }
 }
