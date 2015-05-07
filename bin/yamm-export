@@ -1,0 +1,17 @@
+#!/usr/bin/env php
+<?php
+
+
+function getShopBasePath() {
+    return __DIR__ . '/../../../../';
+}
+
+require_once __DIR__ . '/../../../../bootstrap.php';
+
+if (!class_exists('Symfony\Component\Console\Application')) {
+    die("Symfony Console is not installed, make sure that the composer package symfony/console is installed to use this CLI Script \n");
+}
+
+$application = new Symfony\Component\Console\Application();
+$application->add(new YAMM\Command\ExportCommand());
+$application->run();

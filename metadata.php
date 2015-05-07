@@ -34,14 +34,18 @@ $aModule = array(
     ),
     'files' => array(
 		'yamm_events'            => 'yamm/yamm/core/yamm_events.php',
-		'yamm_export'            => 'yamm/yamm/export.php',
+		'yamm_export'            => 'yamm/yamm/core/yamm_export.php',
 		'yamm_module_metadata'   => 'yamm/yamm/core/yamm_module_metadata.php',
+		'yamm_module_cleanup'   => 'yamm/yamm/services/yamm_module_cleanup.php',
+		'yamm_exporter'   => 'yamm/yamm/services/yamm_exporter.php',
+		'yamm_module_vars'   => 'yamm/yamm/services/yamm_module_vars.php'
 	),
     'templates' => array(
         'yamm_module_list.tpl'     => 'yamm/yamm/views/admin/tpl/yamm_module_list.tpl',
         'yamm_module_main.tpl'     => 'yamm/yamm/views/admin/tpl/yamm_module_main.tpl',
         'yamm_module_sortlist.tpl' => 'yamm/yamm/views/admin/tpl/yamm_module_sortlist.tpl',
         'yamm_module_metadata.tpl' => 'yamm/yamm/views/admin/tpl/yamm_module_metadata.tpl',
+        'yamm_export.tpl' => 'yamm/yamm/views/admin/tpl/yamm_export.tpl'
     ),
 	'blocks' => array(
 		array('template' => 'headitem.tpl', 'block' => 'admin_headitem_inccss', 'file' => 'views/admin/blocks/yamm_inccss.tpl'),

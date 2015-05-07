@@ -106,7 +106,11 @@
         
         <div class="buttonBox">
             <div>
-                <button class="saveButton" name="exportButton" id="yammExportButton">[{ oxmultilang ident="YAMM_EXPORT" }]</button>
+                <form name="yamm_export" id="yamm_export" action="[{ $oViewConf->getSelfLink() }]">
+                    [{ $oViewConf->getHiddenSid() }]
+                    <input type="hidden" name="cl" value="yamm_export">
+                    <input type="submit" name="exportButton" class="saveButton" value="[{ oxmultilang ident="YAMM_EXPORT" }]">
+                </form>
             </div>
             <div class="description">
                 <p>[{ oxmultilang ident="YAMM_EXPORT_DESC" }]</p>

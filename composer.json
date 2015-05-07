@@ -22,7 +22,8 @@
     "require": {
 
     },
+    "bin": ["bin/yamm-export"],
     "autoload": {
-        "classmap": ["core/"]
+        "classmap": ["core/", "command/"]
     }
 }
