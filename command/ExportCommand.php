@@ -20,22 +20,27 @@ class ExportCommand extends Command
                 'shop',
                 InputArgument::OPTIONAL,
                 'The shop ID of the shop you want to export your YAMM Config from'
+            )->addArgument(
+                'inheritFromParent',
+                InputArgument::OPTIONAL,
+                'Decides weather the generated config should be inherited from the parent shop id',
+                false
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $yamm = new \yamm_exporter();
+        $yamm = new \yamm_exporter((bool) $input->getArgument('inheritFromParent'));
 
         if ($input->getArgument('shop')) {
-            $yamm->export($input->getArgument('shop'));
+            $output->write($yamm->export($input->getArgument('shop')));
         } else {
             $output->writeln('Generating YAMM Configs for all Shops.');
             $shopIds = \oxRegistry::getConfig()->getShopIds();
             sort($shopIds);
             foreach ($shopIds as $shopId) {
                 $output->writeln(sprintf('Generating YAMM Configs for Shop with ID %d', $shopId));
-                $yamm->export($shopId);
+                $output->write($yamm->export($shopId));
             }
         }
     }
