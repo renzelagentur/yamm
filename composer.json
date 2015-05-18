@@ -24,6 +24,6 @@
     },
     "bin": ["bin/yamm-export"],
     "autoload": {
-        "classmap": ["core/", "command/", "services/"]
+        "classmap": ["command/", "services/"]
     }
 }

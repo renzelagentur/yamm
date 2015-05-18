@@ -81,3 +81,7 @@
     display: inline-block;
     padding-left: inherit;
 }
+
+.select {
+    width: 75px;
+}

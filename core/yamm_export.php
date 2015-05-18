@@ -5,8 +5,6 @@
  */
 class yamm_export extends oxUBase {
 
-    private $shopId;
-
     /**
      * Should the config be generated as config inherited by it's parent shop's config?
      * @var bool
@@ -36,9 +34,9 @@ class yamm_export extends oxUBase {
 
     /**
      * The generated Export data
-     * @var null
+     * @var array
      */
-    private $_sExportOutput = null;
+    private $_aExportOutput = array();
 
     /**
      * A list of errors (Exceptions) to be displayed
@@ -47,6 +45,18 @@ class yamm_export extends oxUBase {
     private $_aErrors = array();
 
     /**
+     * A list of Shop IDs to generate the configs for
+     * @var array
+     */
+    private $_aShopIds = array();
+
+    /**
+     * A parameter that can be set, to force configs to extend this parent
+     * @var null
+     */
+    private $_iOverwriteParent = null;
+
+   /**
      * Takes care of rendering the form in export view
      * @return null|string
      */
@@ -67,8 +77,13 @@ class yamm_export extends oxUBase {
 
         // Params for use inside the controller
         $this->addTplParam('sOutputType', $this->_sOutputType);
-        $this->addTplParam('sGeneratedOutput', $this->_sExportOutput);
+        $this->addTplParam('aGeneratedOutput', $this->_aExportOutput);
         $this->addTplParam('aErrors', $this->_aErrors);
+        $aShopIds = oxRegistry::getConfig()->getShopIds();
+        sort($aShopIds);
+        $this->addTplParam('aShopIds', $aShopIds);
+        $this->addTplParam('aSelectedShopIds', $this->_aShopIds);
+        $this->addTplParam('iOverwriteParent', $this->_iOverwriteParent);
 
         $sContext = oxRegistry::getConfig()->getShopConfVar('sYAMMContext');
         $this->addTplParam('sContext', $sContext !== null && $sContext !== '' ? $sContext : 'production');
@@ -84,7 +99,7 @@ class yamm_export extends oxUBase {
             // Get all GET parameters and set corresponding field values
             $exportConfig = $this->getConfig()->getRequestParameter('yamm_export');
             foreach ($exportConfig as $key => $value) {
-                if (isset($this->{'_' . $key})) {
+                if (property_exists($this, '_' . $key)) {
                     $this->{'_' . $key} = $value;
                 }
             }
@@ -96,10 +111,25 @@ class yamm_export extends oxUBase {
                 return false;
             }
 
-            $yammExporter = oxNew("yamm_exporter", $this->_blInheritConfigFromParent, $this->_blExportDisabledModules, $this->_blExportClassOrder);
-            $this->_sExportOutput = $yammExporter->export(oxRegistry::getConfig()->getShopId());
+            $yammExporter = oxNew(
+                "yamm_exporter",
+                $this->_blInheritConfigFromParent,
+                $this->_blExportDisabledModules,
+                $this->_blExportClassOrder,
+                $this->_iOverwriteParent
+            );
 
-            if ($this->_sExportOutput !== null) {
+            if (!empty($this->_aShopIds)) {
+                foreach ($this->_aShopIds as $sShopId) {
+                    $this->_aExportOutput[$sShopId] = $yammExporter->export($sShopId);
+                }
+            } else {
+                $this->_aExportOutput[oxRegistry::getConfig()->getShopId()] = $yammExporter->export(
+                    oxRegistry::getConfig()->getShopId()
+                );
+            }
+
+            if (!empty($this->_aExportOutput)) {
                 switch ($this->_sOutputType) {
                     // Offer generated config file as file download
                     case "download":
@@ -141,17 +171,19 @@ class yamm_export extends oxUBase {
     {
         $sConfigPath = rtrim(getShopBasePath(), '/');
 
-        $sYAMMConfigFile = $this->getConfigPath($sConfigPath, oxRegistry::getConfig()->getShopId());
-        try {
-            if (!is_dir(dirname($sYAMMConfigFile))) {
-                @mkdir(dirname($sYAMMConfigFile), 0775, true);
+        foreach ($this->_aExportOutput as $sShopId => $sExportOutput) {
+            $sYAMMConfigFile = $this->getConfigPath($sConfigPath, $sShopId);
+            try {
                 if (!is_dir(dirname($sYAMMConfigFile))) {
-                    throw new \RuntimeException("Could not create directory " . dirname($sYAMMConfigFile) . ", check file permissions ");
+                    @mkdir(dirname($sYAMMConfigFile), 0775, true);
+                    if (!is_dir(dirname($sYAMMConfigFile))) {
+                        throw new \RuntimeException("Could not create directory " . dirname($sYAMMConfigFile) . ", check file permissions ");
+                    }
                 }
+                file_put_contents($sYAMMConfigFile, $sExportOutput);
+            } catch (\Exception $e) {
+                $this->_aErrors[] = $e;
             }
-            file_put_contents($sYAMMConfigFile, $this->_sExportOutput);
-        } catch (\Exception $e) {
-            $this->_aErrors[] = $e;
         }
     }
 
@@ -169,14 +201,16 @@ class yamm_export extends oxUBase {
         // Zip will open and overwrite the file, rather than try to read it.
         $zip->open($file, ZipArchive::OVERWRITE);
 
-        $zip->addFromString($this->getConfigPath('', oxRegistry::getConfig()->getShopId()), $this->_sExportOutput);
+        foreach ($this->_aExportOutput as $sShopid => $sExportOutput) {
+            $zip->addFromString($this->getConfigPath('', $sShopid), $sExportOutput);
+        }
 
         $zip->close();
 
         // Stream the file to the client
         $oUtils->setHeader("Content-Type: application/zip");
         $oUtils->setHeader("Content-Length: " . filesize($file));
-        $oUtils->setHeader("Content-Disposition: attachment; filename=\"a_zip_file.zip\"");
+        $oUtils->setHeader("Content-Disposition: attachment; filename=\"yamm.zip\"");
         $content = readfile($file);
         unlink($file);
         $oUtils->showMessageAndExit($content);

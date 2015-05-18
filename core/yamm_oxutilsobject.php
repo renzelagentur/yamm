@@ -34,6 +34,8 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
 
     private $sYAMMContext;
 
+    private $_bInitCalled = false;
+
     private function activate($oModule, $method = 'activate')
     {
         if ( class_exists('oxModuleInstaller') ) {
@@ -87,7 +89,8 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
                 continue;
 
             $metaFile = rtrim(getShopBasePath(), '/') . '/modules/' . $modulePaths[$id] . '/metadata.php';
-            if ( filemtime($metaFile) > $data['metafiles'][$id]['last_modified'] ) {
+
+            if (file_exists($metaFile) && filemtime($metaFile) > $data['metafiles'][$id]['last_modified'] ) {
                 error_log("Reactivate {$id}");
                 $oModule->load($id);
 
@@ -126,7 +129,9 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
         $data = array('config' => $this->_staticEntries, 'metafiles' => array(), );
         foreach ($this->_staticEntries[self::ENABLED] as $id) {
             $metaFile = rtrim(getShopBasePath(), '/') . '/modules/' . $modulePaths[$id] . '/metadata.php';
-            $data['metafiles'][$id] = array('metafile' => $metaFile, 'last_modified' => filemtime($metaFile), );
+            if (file_exists($metaFile)) {
+                $data['metafiles'][$id] = array('metafile' => $metaFile, 'last_modified' => filemtime($metaFile), );
+            }
         }
         oxRegistry::getConfig()->saveShopConfVar('arr', self::CACHED_CONFIG, $data, null, 'yamm/yamm');
         oxRegistry::getConfig()->saveShopConfVar('num', self::LAST_MODIFIED, filemtime($this->sYAMMConfigFile), null, 'yamm/yamm');
@@ -142,6 +147,12 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
         return isset($this->_staticEntries) && array_key_exists($key, $this->_staticEntries);
     }
 
+
+    /**
+     * @param $class
+     *
+     * @return array
+     */
     private function getOrderForClass($class)
     {
         $result = $this->_staticEntries[self::ENABLED];
@@ -150,6 +161,7 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
                 $result = array_merge(array_diff($result, $this->_staticEntries[self::CLASS_ORDER][$class]), $this->_staticEntries[self::CLASS_ORDER][$class]);
             }
         }
+
         return $result;
     }
 
@@ -168,17 +180,18 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
         }
 
         $sConfigPath = rtrim(getShopBasePath(), '/') . '/YAMM';
-
-        if (oxRegistry::getConfig()->getShopConfVar('sYAMMContext') !== null) {
-            $this->sYAMMContext = oxRegistry::getConfig()->getShopConfVar('sYAMMContext');
+        if (defined('YAMM_CONTEXT') && YAMM_CONTEXT !== null) {
+            $this->sYAMMContext = YAMM_CONTEXT;
         } else {
             $this->sYAMMContext = 'production';
         }
 
         if (is_dir($sConfigPath . '/' . $this->sYAMMContext)) {
             $sConfigPath .= '/' . $this->sYAMMContext;
+        // If there is a config for a production context, fall back to it, otherwise use none at all
+        } else if (is_dir($sConfigPath . '/production')) {
+            $sConfigPath .= '/production';
         }
-
         $this->bMultiShop = oxRegistry::getConfig()->getShopId() !== 'oxbaseshop';
         if ($this->bMultiShop) {
             if (is_dir($sConfigPath . '/' . oxRegistry::getConfig()->getShopId())) {
@@ -187,7 +200,6 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
         }
 
         $this->sYAMMConfigFile = $sConfigPath . '/' . $this->_sConfigFile;
-
         if (file_exists($this->sYAMMConfigFile) && (!isset($this->_staticEntries) || defined('YAMM_FORCE_RELOAD')) ) {
             include ($this->sYAMMConfigFile);
             $this->_staticEntries = $aYAMMConfig;
@@ -238,13 +250,12 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
 
     public function getModuleVar($sModuleVarName)
     {
-        if ($this->_staticEntries === NULL) {
-            $this->initYAMM();
-        }
-
         if ( isset($this->_staticEntries) && array_key_exists($sModuleVarName, $this->_staticEntries) ) {
             if ( $sModuleVarName === 'aDisabledModules' ) {
                 // @formatter:off
+
+                // Merge YAMM config with deactivated modules from Oxid DB, then make sure that YAMM enabled modules
+                // are active, even if otherwise deactivated
                 $result = array_diff(
                     array_merge(
                         parent::getModuleVar($sModuleVarName),
@@ -263,6 +274,8 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
         } else {
             $result = parent::getModuleVar($sModuleVarName);
         }
+
+
 
         return $result;
     }

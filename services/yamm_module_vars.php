@@ -15,6 +15,7 @@ class yamm_module_vars {
 
     public function getModules($iShopId) {
         $sQuery = sprintf('SELECT OXID, OXSHOPID, OXVARNAME, OXVARTYPE, DECODE(oxvarvalue, "%s") as OXVARVALUE FROM oxconfig WHERE OXVARNAME = "aModules" AND OXSHOPID = %s', oxRegistry::getConfig()->getConfigParam('sConfigKey'), (int) $iShopId);
+
         $result = $this->_oDb->getAll($sQuery);
         $varValue = unserialize($result[0][4]);
         return $varValue;

@@ -18,10 +18,12 @@
 </ul>
 [{/if}]
 
-[{if $sOutputType == "echo" && $sGeneratedOutput}]
-<div>
-    [{$sGeneratedOutput|highlight_string:true}]
-</div>
+[{if $sOutputType == "echo" && $aGeneratedOutput}]
+    [{foreach from=$aGeneratedOutput item=sGeneratedOutput}]
+    <div>
+        [{$sGeneratedOutput|highlight_string:true}]
+    </div>
+    [{/foreach}]
 [{/if}]
 <div>
     <h3>Export Einstellungen: </h3>
@@ -39,6 +41,21 @@
                         <input type="checkbox" name="yamm_export[blInheritConfigFromParent]" id="blInheritConfigFromParent" value="1" [{if $blInheritConfigFromParent}]checked="checked"[{/if}]/>
                     </td>
                 </tr>
+
+                <tr>
+                    <td class="edittext">
+                        <label for="yamm_export[iOverwriteParent]">Vatershop ID überschreiben:</label>
+                    </td>
+                    <td class="edittext">
+                        [{$iOverwriteParent}]
+                        <select  name="yamm_export[iOverwriteParent]" class="select">
+                            [{foreach from=$aShopIds item=sShopId}]
+                            <option [{if $sShopId == $iOverwriteParent}]selected="selected"[{/if}]>[{$sShopId}]</option>
+                            [{/foreach}]
+                        </select>
+                    </td>
+                </tr>
+
                 [{/if}]
                 <tr>
                     <td class="edittext">
@@ -78,12 +95,26 @@
                         <input type="radio" id="sOutputType" name="yamm_export[sOutputType]" value="download" [{if $sOutputType == "download"}]checked="checked"[{/if}]/>
                     </td>
                 </tr>
+
+                <tr>
+                    <td class="edittext">
+                        <label for="aShopIds">Für Shops erzeugen (Auswahl leer lassen, für nur aktueller Shop):</label>
+                    </td>
+                    <td class="edittext">
+                        <select multiple="multiple" name="yamm_export[aShopIds][]" class="select" size="[{math equation="x / 3" x=$aShopIds|@count}]">
+                            [{foreach from=$aShopIds item=sShopId}]
+                                <option [{if in_array($sShopId, $aSelectedShopIds)}]selected="selected"[{/if}]>[{$sShopId}]</option>
+                            [{/foreach}]
+                        </select>
+                    </td>
+                </tr>
+
                 [{if $sContext != 'production'}]
                 <tr>
                     <td class="edittext">
                         <label for="blWriteToFileSystem">Config im Dateisystem überschreiben:</label>
                     </td>
-                    <td class="edittext">
+                    <td class="editselect">
                         <input type="radio" id="sOutputType" name="yamm_export[sOutputType]" value="save" [{if $sOutputType == "save"}]checked="checked"[{/if}]/>
                     </td>
                 </tr>
