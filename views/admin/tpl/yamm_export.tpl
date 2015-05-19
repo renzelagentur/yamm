@@ -10,7 +10,7 @@
 [{include file="headitem.tpl" title="GENERAL_ADMIN_TITLE"|oxmultilangassign box="box"}]
 
 [{if $aErrors}]
-<h3 class="error">Errors:</h3>
+<h3 class="error">[{ oxmultilang ident="YAMM_EXPORT_ERRORS" }]:</h3>
 <ul class="error">
 [{foreach from=$aErrors item=oException}]
     <li>[{$oException->getMessage()}]</li>
@@ -26,14 +26,14 @@
     [{/foreach}]
 [{/if}]
 <div>
-    <h3>Export Einstellungen: </h3>
+    <h3>[{ oxmultilang ident="YAMM_EXPORT_SETTINGS" }]: </h3>
     <form action="[{$sAction}]" method="POST">
         <table>
             <tbody>
                 [{if $blHasParentShop}]
                 <tr>
                     <td class="edittext">
-                        <label for="blInheritConfigFromParent">Config von Vatershop erben:</label>
+                        <label for="blInheritConfigFromParent">[{ oxmultilang ident="YAMM_EXPORT_INHERIT_FROM_PARENT" }]:</label>
                     </td>
                     <td class="edittext">
 
@@ -44,7 +44,7 @@
 
                 <tr>
                     <td class="edittext">
-                        <label for="yamm_export[iOverwriteParent]">Vatershop ID überschreiben:</label>
+                        <label for="yamm_export[iOverwriteParent]">[{ oxmultilang ident="YAMM_EXPORT_OVERWRITE_PARENT" }]:</label>
                     </td>
                     <td class="edittext">
                         [{$iOverwriteParent}]
@@ -59,7 +59,7 @@
                 [{/if}]
                 <tr>
                     <td class="edittext">
-                        <label for="blExportDisabledModules">Aktivieren von inaktiven Modulen sperren:</label>
+                        <label for="blExportDisabledModules">[{ oxmultilang ident="YAMM_EXPORT_DISABLED_MODULES" }]:</label>
                     </td>
                     <td class="edittext">
 
@@ -70,7 +70,7 @@
 
                 <tr>
                     <td class="edittext">
-                        <label for="blExportClassOrder">Klassenreihenfolge forcieren:</label>
+                        <label for="blExportClassOrder">[{ oxmultilang ident="YAMM_EXPORT_CLASS_ORDER" }]:</label>
                     </td>
                     <td class="edittext">
 
@@ -81,7 +81,7 @@
 
                 <tr>
                     <td class="edittext">
-                        <label for="blWriteToFileSystem">Config ausgeben:</label>
+                        <label for="blWriteToFileSystem">[{ oxmultilang ident="YAMM_EXPORT_OUTPUT_CONFIG" }]:</label>
                     </td>
                     <td class="edittext">
                         <input type="radio" id="sOutputType" name="yamm_export[sOutputType]" value="echo" [{if $sOutputType == "echo"}]checked="checked"[{/if}]/>
@@ -89,7 +89,7 @@
                 </tr>
                 <tr>
                     <td class="edittext">
-                        <label for="blWriteToFileSystem">Config herunterladen:</label>
+                        <label for="blWriteToFileSystem">[{ oxmultilang ident="YAMM_EXPORT_DOWNLOAD_CONFIG" }]:</label>
                     </td>
                     <td class="edittext">
                         <input type="radio" id="sOutputType" name="yamm_export[sOutputType]" value="download" [{if $sOutputType == "download"}]checked="checked"[{/if}]/>
@@ -98,7 +98,7 @@
 
                 <tr>
                     <td class="edittext">
-                        <label for="aShopIds">Für Shops erzeugen (Auswahl leer lassen, für nur aktueller Shop):</label>
+                        <label for="aShopIds">[{ oxmultilang ident="YAMM_EXPORT_SHOP_SELECTION" }]:</label>
                     </td>
                     <td class="edittext">
                         <select multiple="multiple" name="yamm_export[aShopIds][]" class="select" size="[{math equation="x / 3" x=$aShopIds|@count}]">
@@ -112,7 +112,7 @@
                 [{if $sContext != 'production'}]
                 <tr>
                     <td class="edittext">
-                        <label for="blWriteToFileSystem">Config im Dateisystem überschreiben:</label>
+                        <label for="blWriteToFileSystem">[{ oxmultilang ident="YAMM_EXPORT_OVERWRITE_CONFIG" }]:</label>
                     </td>
                     <td class="editselect">
                         <input type="radio" id="sOutputType" name="yamm_export[sOutputType]" value="save" [{if $sOutputType == "save"}]checked="checked"[{/if}]/>
