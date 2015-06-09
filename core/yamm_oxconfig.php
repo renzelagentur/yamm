@@ -12,12 +12,6 @@
 class yamm_oxconfig extends yamm_oxconfig_parent
 {
 
-    public function init()
-    {
-        oxUtilsObject::getInstance()->initYAMM();
-        parent::init();
-    }
-
     public function getConfigParam($sName)
     {
         $mValue = parent::getConfigParam($sName);

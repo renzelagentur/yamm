@@ -38,7 +38,12 @@ $aModule = array(
 		'yamm_module_metadata'   => 'yamm/yamm/core/yamm_module_metadata.php',
 		'yamm_module_cleanup'   => 'yamm/yamm/services/yamm_module_cleanup.php',
 		'yamm_exporter'   => 'yamm/yamm/services/yamm_exporter.php',
-		'yamm_module_vars'   => 'yamm/yamm/services/yamm_module_vars.php'
+		'yamm_module_vars'   => 'yamm/yamm/services/yamm_module_vars.php',
+		'yamm_config_loader_php'   => 'yamm/yamm/services/yamm_config_loader_php.php',
+		'yamm_config_loader_csv'   => 'yamm/yamm/services/yamm_config_loader_csv.php',
+		'yamm_invalid_argument_exception'   => 'yamm/yamm/exception/yamm_invalid_argument_exception.php',
+		'yamm_config_not_found_exception'   => 'yamm/yamm/exception/yamm_config_not_found_exception.php',
+
 	),
     'templates' => array(
         'yamm_module_list.tpl'     => 'yamm/yamm/views/admin/tpl/yamm_module_list.tpl',

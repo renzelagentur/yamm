@@ -9,33 +9,65 @@
  * Author URI: http://www.marmalade.de
  */
 
+require_once __DIR__ . '/../services/yamm_config_loader_factory.php';
+
 class yamm_oxutilsobject extends yamm_oxutilsobject_parent
 {
 
-    protected $_sConfigFile = 'yamm.config.php';
-
     protected $_staticEntries = null;
 
+    /**
+     * @var yamm_config_loader_interface
+     */
+    private $configLoader;
+
+    /**
+     * YAMM Variable Name for Enabled Modules
+     */
     const ENABLED = 'aYAMMEnabledModules';
 
+    /**
+     * YAMM Variable Name for disabled Modules
+     */
     const DISABLED = 'aYAMMDisabledModules';
 
+    /**
+     * YAMM Variable Name for Special Class Ordering
+     */
     const CLASS_ORDER = 'aYAMMSpecialClassOrder';
 
+    /**
+     * YAMM Variable for Block Control
+     */
     const BLOCK_CONTROL = 'bYAMMBlockControl';
 
+    /**
+     * Variable Name for the Cached config
+     */
     const CACHED_CONFIG = 'aYAMMCachedConfig';
 
+    /**
+     * Config Variable Name, for the timestamp on which the config has been last modified
+     */
     const LAST_MODIFIED = 'iYAMMLastModified';
 
-    private $bMultiShop;
+    /**
+     * YAMM Variable Name for Module Paths
+     */
+    const MODULE_PATHS = 'aModulePaths';
 
-    private $sYAMMConfigFile;
-
-    private $sYAMMContext;
-
+    /**
+     * Set to true, if initYAMM has been called allready, to make sure it is only executed once
+     * @var bool
+     */
     private $_bInitCalled = false;
 
+    /**
+     * Calsl a method to activate or deactivate a module
+     *
+     * @param        $oModule
+     * @param string $method
+     */
     private function activate($oModule, $method = 'activate')
     {
         if ( class_exists('oxModuleInstaller') ) {
@@ -45,6 +77,10 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
         }
     }
 
+    /**
+     * Checks for changes in the YAMM Config or Module Metadata and reacty to it accordingly
+     * @param $modulePaths
+     */
     private function handleConfigChanges($modulePaths)
     {
         $data = oxRegistry::getConfig()->getShopConfVar(self::CACHED_CONFIG, null, 'yamm/yamm');
@@ -54,7 +90,7 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
         }
         $newlyActivated = array();
 
-        if ( oxRegistry::getConfig()->getShopConfVar(self::LAST_MODIFIED, null, 'yamm/yamm') < filemtime($this->sYAMMConfigFile) || defined('YAMM_FORCE_RELOAD') ) {
+        if ( oxRegistry::getConfig()->getShopConfVar(self::LAST_MODIFIED, null, 'yamm/yamm') < $this->configLoader->getConfigModificationTime() || defined('YAMM_FORCE_RELOAD') ) {
 
             foreach ($this->_staticEntries[self::ENABLED] as $id) {
                 $oModule->load($id);
@@ -91,7 +127,7 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
             $metaFile = rtrim(getShopBasePath(), '/') . '/modules/' . $modulePaths[$id] . '/metadata.php';
 
             if (file_exists($metaFile) && filemtime($metaFile) > $data['metafiles'][$id]['last_modified'] ) {
-                error_log("Reactivate {$id}");
+                $this->log(sprintf("Metadata of module '%s' has changed. Reactivating it.", $id));
                 $oModule->load($id);
 
                 // Since 4.9/EE5.2 Module Configs are deleted, when you deactivate a module,
@@ -137,17 +173,6 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
         oxRegistry::getConfig()->saveShopConfVar('num', self::LAST_MODIFIED, filemtime($this->sYAMMConfigFile), null, 'yamm/yamm');
     }
 
-    public function getYAMMKeys()
-    {
-        return isset($this->_staticEntries) ? array_keys($this->_staticEntries) : array();
-    }
-
-    public function hasYAMMKey($key)
-    {
-        return isset($this->_staticEntries) && array_key_exists($key, $this->_staticEntries);
-    }
-
-
     /**
      * @param $class
      *
@@ -170,44 +195,45 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
         return array_key_exists($class, $this->_staticEntries['aModules']) ? $this->_staticEntries['aModules'][$class] : array();
     }
 
-    public function initYAMM()
+    /**
+     * Initializes all YAMM Config Variables
+     */
+    private function initYAMM()
     {
-
+        // Only execute the heavy lifting once
         if ($this->_bInitCalled) {
             return;
         } else {
             $this->_bInitCalled = true;
         }
 
-        $sConfigPath = rtrim(getShopBasePath(), '/') . '/YAMM';
-        if (defined('YAMM_CONTEXT') && YAMM_CONTEXT !== null) {
-            $this->sYAMMContext = YAMM_CONTEXT;
+        if (defined('YAMM_CONFIG_TYPE')) {
+            $configType = YAMM_CONFIG_TYPE;
+            $this->configLoader = yamm_config_loader_factory::getLoader($configType);
         } else {
-            $this->sYAMMContext = 'production';
+            $this->configLoader = yamm_config_loader_factory::getLoader();
         }
 
-        if (is_dir($sConfigPath . '/' . $this->sYAMMContext)) {
-            $sConfigPath .= '/' . $this->sYAMMContext;
-        // If there is a config for a production context, fall back to it, otherwise use none at all
-        } else if (is_dir($sConfigPath . '/production')) {
-            $sConfigPath .= '/production';
-        }
-        $this->bMultiShop = oxRegistry::getConfig()->getShopId() !== 'oxbaseshop';
-        if ($this->bMultiShop) {
-            if (is_dir($sConfigPath . '/' . oxRegistry::getConfig()->getShopId())) {
-                $sConfigPath .= '/' . oxRegistry::getConfig()->getShopId();
-            }
-        }
+        /**
+         * @var $configLoader yamm_config_loader_interface
+         */
+        if ($this->configLoader->configFound() && (!isset($this->_staticEntries) || defined('YAMM_FORCE_RELOAD')) ) {
 
-        $this->sYAMMConfigFile = $sConfigPath . '/' . $this->_sConfigFile;
-        if (file_exists($this->sYAMMConfigFile) && (!isset($this->_staticEntries) || defined('YAMM_FORCE_RELOAD')) ) {
-            include ($this->sYAMMConfigFile);
-            $this->_staticEntries = $aYAMMConfig;
+            $this->_staticEntries = array(
+                self::ENABLED       => $this->configLoader->getEnabledModules(),
+                self::DISABLED      => $this->configLoader->getDisabledModules(),
+                self::CLASS_ORDER   => $this->configLoader->getSpecialClassOrder(),
+                self::BLOCK_CONTROL => $this->configLoader->getBlockControl(),
+                self::MODULE_PATHS  => $this->configLoader->getModulePaths()
+            );
+
             $modulePaths = array_merge(parent::getModuleVar('aModulePaths'), isset($this->_staticEntries['aModulePaths']) ? $this->_staticEntries['aModulePaths'] : array());
+
             $this->handleConfigChanges($modulePaths);
-            $this->_staticEntries['aModules'] = parent::getModuleVar('aModules');
-            $this->_staticEntries['aModuleFiles'] = parent::getModuleVar('aModuleFiles') ? parent::getModuleVar('aModuleFiles') : array();
-            $this->_staticEntries['aModuleTemplates'] = parent::getModuleVar('aModuleTemplates') ? parent::getModuleVar('aModuleTemplates') : array();
+
+            $this->_staticEntries['aModules']           = parent::getModuleVar('aModules');
+            $this->_staticEntries['aModuleFiles']       = parent::getModuleVar('aModuleFiles') ? parent::getModuleVar('aModuleFiles') : array();
+            $this->_staticEntries['aModuleTemplates']   = parent::getModuleVar('aModuleTemplates') ? parent::getModuleVar('aModuleTemplates') : array();
 
             foreach ($this->_staticEntries['aModules'] as $key => $value) {
                 $this->_staticEntries['aModules'][$key] = explode('&', $value);
@@ -248,8 +274,21 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
         }
     }
 
+    public function getYAMMKeys()
+    {
+        $this->initYAMM();
+        return isset($this->_staticEntries) ? array_keys($this->_staticEntries) : array();
+    }
+
+    public function hasYAMMKey($key)
+    {
+        $this->initYAMM();
+        return isset($this->_staticEntries) && array_key_exists($key, $this->_staticEntries);
+    }
+
     public function getModuleVar($sModuleVarName)
     {
+        $this->initYAMM();
         if ( isset($this->_staticEntries) && array_key_exists($sModuleVarName, $this->_staticEntries) ) {
             if ( $sModuleVarName === 'aDisabledModules' ) {
                 // @formatter:off
@@ -276,8 +315,16 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
         }
 
 
-
         return $result;
     }
 
+    /**
+     * Writes a message to the yamm.log
+     * @param $message
+     */
+    private function log($message) {
+        oxRegistry::getUtils()->writeToLog(sprintf("%s: %s \nm", date("Y-m-d H:i:s"), $message), 'yamm.log');
+    }
+
 }
+

@@ -21,6 +21,7 @@ class yamm_module_cleanup
 {
 
     private $moduleDir = null;
+    
     private $errorCallback;
 
     /**
@@ -117,18 +118,22 @@ class yamm_module_cleanup
             if ($varValue) {
                 foreach ($varValue as $module => $files) {
 
-                    foreach ($files as $index => $file) {
-                        if (!file_exists($this->moduleDir . $file)) {
-                            unset($files[$index]);
-                            $bChanged = true;
+                    if (is_array($files)) {
+                        foreach ($files as $index => $file) {
+                            if (!file_exists(realpath(dirname(__FILE__)) . '/../../modules/' . $file)) {
+                                unset($files[$index]);
+                                $bChanged = true;
+                            }
                         }
+                        if (count($files) == 0) {
+                            unset($varValue[$module]);
+                        } else {
+                            $varValue[$module] = $files;
+                        }
+                    } else {
+                        unset($varValue[$module]);
                     }
 
-                    if (count($files) == 0) {
-                        unset($varValue[$module]);
-                    } else {
-                        $varValue[$module] = $files;
-                    }
                 }
 
                 if ($bChanged) {
