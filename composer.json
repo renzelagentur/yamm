@@ -20,7 +20,7 @@
         }
     ],
     "require": {
-
+        "ra/oxid-cleanup-scripts": "dev-master"
     },
     "bin": ["bin/yamm-export"],
     "autoload": {

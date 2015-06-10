@@ -1,4 +1,5 @@
 <?php
+use RA\OxidCleanupScripts\OxidCleanup;
 
 /**
  * Controller that is used to export YAMM Configuration files for any Shop
@@ -148,19 +149,9 @@ class yamm_export extends oxUBase {
      * Calls the cleanup service to clean up all of Oxid's module handling internal data
      */
     private function cleanUpModules() {
-        $oCleanUpService = oxNew("yamm_module_cleanup", oxDb::getDb());
+        $oCleanUpService = new OxidCleanup(getShopBasePath());
 
-        $oCleanUpService->cleanUpModulePaths();
-
-        // Clean Up the A Modules array
-        $oCleanUpService->cleanUpModuleExtends();
-
-        // Clean up disabled Modules
-        $oCleanUpService->cleanUpDisabledModules();
-
-        $oCleanUpService->cleanUpModuleFiles();
-
-        $oCleanUpService->cleanupDuplicateBlocks();
+        $oCleanUpService->fullCleanUp();
     }
 
     /**

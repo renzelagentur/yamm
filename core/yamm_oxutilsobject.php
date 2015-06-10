@@ -9,12 +9,15 @@
  * Author URI: http://www.marmalade.de
  */
 
+use RA\OxidCleanupScripts\OxidCleanup;
+
 require_once __DIR__ . '/../services/yamm_config_loader_factory.php';
 
 class yamm_oxutilsobject extends yamm_oxutilsobject_parent
 {
 
     protected $_staticEntries = null;
+    private $moduleCleanup;
 
     /**
      * @var yamm_config_loader_interface
@@ -60,7 +63,7 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
      * Set to true, if initYAMM has been called allready, to make sure it is only executed once
      * @var bool
      */
-    private $_bInitCalled = false;
+    static $_bInitCalled = false;
 
     /**
      * Calsl a method to activate or deactivate a module
@@ -78,6 +81,21 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
     }
 
     /**
+     * Creates an instance of the Module Cleanup service and returns it
+     */
+    private function getModuleCleanupService()
+    {
+        if (is_null($this->moduleCleanup)) {
+            $this->moduleCleanup = new OxidCleanup(getShopBasePath());
+            $this->moduleCleanup->registerOutputHandler(function($message) {
+                    $this->log($message);
+                });
+        }
+
+        return $this->moduleCleanup;
+    }
+
+    /**
      * Checks for changes in the YAMM Config or Module Metadata and reacty to it accordingly
      * @param $modulePaths
      */
@@ -90,7 +108,15 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
         }
         $newlyActivated = array();
 
-        if ( oxRegistry::getConfig()->getShopConfVar(self::LAST_MODIFIED, null, 'yamm/yamm') < $this->configLoader->getConfigModificationTime() || defined('YAMM_FORCE_RELOAD') ) {
+        $bCleanupRun = false;
+
+
+        $configModTime = $this->configLoader->getConfigModificationTime();
+        if ( oxRegistry::getConfig()->getShopConfVar(self::LAST_MODIFIED, null, 'yamm/yamm') < $configModTime || defined('YAMM_FORCE_RELOAD') ) {
+
+            $this->getModuleCleanupService()->fullCleanUp();
+
+            $bCleanupRun = true;
 
             foreach ($this->_staticEntries[self::ENABLED] as $id) {
                 $oModule->load($id);
@@ -117,6 +143,8 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
             }
         }
 
+        $aModulesToReactivate = array();
+
         // Reactivate modules whoms metadata.php has changed.
         // Must be done to ensure that blocks are loaded, otherwise
         // some modules might break.
@@ -128,37 +156,18 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
 
             if (file_exists($metaFile) && filemtime($metaFile) > $data['metafiles'][$id]['last_modified'] ) {
                 $this->log(sprintf("Metadata of module '%s' has changed. Reactivating it.", $id));
-                $oModule->load($id);
+                $aModulesToReactivate[] = $id;
+            }
+        }
 
-                // Since 4.9/EE5.2 Module Configs are deleted, when you deactivate a module,
-                // this is why we temporarly backup the config to restore it again after activation
-                $sQuery   = sprintf(
-                    'SELECT OXID, OXSHOPID, OXMODULE, OXVARNAME, OXVARTYPE, DECODE(oxvarvalue, "%s") as OXVARVALUE FROM oxconfig WHERE OXSHOPID = "%s" AND OXMODULE = "module:%s"',
-                    oxRegistry::getConfig()->getConfigParam('sConfigKey'),
-                    oxRegistry::getConfig()->getShopId(),
-                    $id
-                );
-                $aResult = oxDb::getDb()->getArray($sQuery);
+        if (count($aModulesToReactivate) > 0)
+        {
+            if (!$bCleanupRun) {
+                $this->getModuleCleanupService()->fullCleanUp();
+            }
 
-                $this->activate($oModule, 'deactivate');
-                $this->activate($oModule);
-
-                foreach ($aResult as $aRow) {
-                    if ($aRow[3] != 'noConfigHere') {
-                        $sQuery   = sprintf(
-                            'INSERT INTO oxconfig SET OXID= %s, OXSHOPID = %s, OXMODULE = %s,OXVARNAME = %s, OXVARTYPE = %s, OXVARVALUE =ENCODE(%s, %s);',
-                            oxDb::getDb()->qstr($aRow[0]),
-                            oxDb::getDb()->qstr($aRow[1]),
-                            oxDb::getDb()->qstr($aRow[2]),
-                            oxDb::getDb()->qstr($aRow[3]),
-                            oxDb::getDb()->qstr($aRow[4]),
-                            oxDb::getDb()->qstr($aRow[5]),
-                            oxDb::getDb()->qstr(oxRegistry::getConfig()->getConfigParam('sConfigKey'))
-                        );
-
-                        oxDb::getDb()->query($sQuery);
-                    }
-                }
+            foreach ($aModulesToReactivate as $moduleId) {
+                $this->reactivateModule($moduleId);
             }
         }
 
@@ -170,7 +179,7 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
             }
         }
         oxRegistry::getConfig()->saveShopConfVar('arr', self::CACHED_CONFIG, $data, null, 'yamm/yamm');
-        oxRegistry::getConfig()->saveShopConfVar('num', self::LAST_MODIFIED, filemtime($this->sYAMMConfigFile), null, 'yamm/yamm');
+        oxRegistry::getConfig()->saveShopConfVar('num', self::LAST_MODIFIED, $configModTime, null, 'yamm/yamm');
     }
 
     /**
@@ -200,11 +209,13 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
      */
     private function initYAMM()
     {
+
+        $startTime = microtime(true);
         // Only execute the heavy lifting once
-        if ($this->_bInitCalled) {
+        if (self::$_bInitCalled) {
             return;
         } else {
-            $this->_bInitCalled = true;
+            self::$_bInitCalled = true;
         }
 
         if (defined('YAMM_CONFIG_TYPE')) {
@@ -226,6 +237,9 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
                 self::BLOCK_CONTROL => $this->configLoader->getBlockControl(),
                 self::MODULE_PATHS  => $this->configLoader->getModulePaths()
             );
+
+            $configLoadTime = microtime(true) - $startTime;
+            $this->log(sprintf("Config Load Time %f seconds", $configLoadTime));
 
             $modulePaths = array_merge(parent::getModuleVar('aModulePaths'), isset($this->_staticEntries['aModulePaths']) ? $this->_staticEntries['aModulePaths'] : array());
 
@@ -272,6 +286,59 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
                 $this->_staticEntries['aModules'][$key] = implode('&', $value);
             }
         }
+
+        $runTime = microtime(true) - $startTime;
+        $this->log(sprintf("InitYAMM runtime %f seconds", $runTime));
+    }
+
+    /**
+     * Writes a message to the yamm.log
+     * @param $message
+     */
+    private function log($message) {
+        oxRegistry::getUtils()->writeToLog(sprintf("%s: %s \n", date("Y-m-d H:i:s"), $message), 'yamm.log');
+    }
+
+    /**
+     * Reactivates a module
+     *
+     * @param $oModule
+     * @param $id
+     */
+    private function reactivateModule($id)
+    {
+        $oModule = oxNew('oxModule');
+        $oModule->load($id);
+
+        // Since 4.9/EE5.2 Module Configs are deleted, when you deactivate a module,
+        // this is why we temporarly backup the config to restore it again after activation
+        $sQuery = sprintf(
+            'SELECT OXID, OXSHOPID, OXMODULE, OXVARNAME, OXVARTYPE, DECODE(oxvarvalue, "%s") as OXVARVALUE FROM oxconfig WHERE OXSHOPID = "%s" AND OXMODULE = "module:%s"',
+            oxRegistry::getConfig()->getConfigParam('sConfigKey'),
+            oxRegistry::getConfig()->getShopId(),
+            $id
+        );
+        $aResult = oxDb::getDb()->getArray($sQuery);
+
+        $this->activate($oModule, 'deactivate');
+        $this->activate($oModule);
+
+        foreach ($aResult as $aRow) {
+            if ($aRow[3] != 'noConfigHere') {
+                $sQuery = sprintf(
+                    'INSERT INTO oxconfig SET OXID= %s, OXSHOPID = %s, OXMODULE = %s,OXVARNAME = %s, OXVARTYPE = %s, OXVARVALUE =ENCODE(%s, %s);',
+                    oxDb::getDb()->qstr($aRow[0]),
+                    oxDb::getDb()->qstr($aRow[1]),
+                    oxDb::getDb()->qstr($aRow[2]),
+                    oxDb::getDb()->qstr($aRow[3]),
+                    oxDb::getDb()->qstr($aRow[4]),
+                    oxDb::getDb()->qstr($aRow[5]),
+                    oxDb::getDb()->qstr(oxRegistry::getConfig()->getConfigParam('sConfigKey'))
+                );
+
+                oxDb::getDb()->query($sQuery);
+            }
+        }
     }
 
     public function getYAMMKeys()
@@ -289,6 +356,7 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
     public function getModuleVar($sModuleVarName)
     {
         $this->initYAMM();
+
         if ( isset($this->_staticEntries) && array_key_exists($sModuleVarName, $this->_staticEntries) ) {
             if ( $sModuleVarName === 'aDisabledModules' ) {
                 // @formatter:off
@@ -316,14 +384,6 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
 
 
         return $result;
-    }
-
-    /**
-     * Writes a message to the yamm.log
-     * @param $message
-     */
-    private function log($message) {
-        oxRegistry::getUtils()->writeToLog(sprintf("%s: %s \nm", date("Y-m-d H:i:s"), $message), 'yamm.log');
     }
 
 }
