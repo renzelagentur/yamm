@@ -18,7 +18,7 @@ class yamm_events
         oxRegistry::getConfig()->saveShopConfVar('arr', 'aCachedConfig', null, null, 'yamm/yamm');
         oxRegistry::getConfig()->saveShopConfVar('num', 'iLastModified', 0, null, 'yamm/yamm');
         $oUtilsObject = oxNew('yamm_oxutilsobject');
-        $oUtilsObject->initYAMM();
+        $oUtilsObject->getYAMMKeys();
     }
 
     protected function deactivate()
