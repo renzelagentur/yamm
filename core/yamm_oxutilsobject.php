@@ -110,14 +110,12 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
 
         $bCleanupRun = false;
 
-
         $configModTime = $this->configLoader->getConfigModificationTime();
-        if ( oxRegistry::getConfig()->getShopConfVar(self::LAST_MODIFIED, null, 'yamm/yamm') < $configModTime || defined('YAMM_FORCE_RELOAD') ) {
+        $checkTime = oxRegistry::getConfig()->getShopConfVar(self::LAST_MODIFIED, null, 'yamm/yamm');
+        $this->log("YAMM Config Modification Time: {$configModTime}, Last Modified: {$configModTime}");
 
-            $this->getModuleCleanupService()->fullCleanUp();
-
-            $bCleanupRun = true;
-
+        if ( $checkTime < $configModTime || defined('YAMM_FORCE_RELOAD') ) {
+            
             foreach ($this->_staticEntries[self::ENABLED] as $id) {
                 $oModule->load($id);
                 if ( !$oModule->isActive() ) {
@@ -153,9 +151,10 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
                 continue;
 
             $metaFile = rtrim(getShopBasePath(), '/') . '/modules/' . $modulePaths[$id] . '/metadata.php';
-
-            if (file_exists($metaFile) && filemtime($metaFile) > $data['metafiles'][$id]['last_modified'] ) {
-                $this->log(sprintf("Metadata of module '%s' has changed. Reactivating it.", $id));
+            $modTime = filemtime($metafile);
+            $checkTime = $data['metafiles'][$id]['last_modified'];
+            if (file_exists($metaFile) && $modTime > $checkTime) {
+                $this->log("Metafile {$metafile} has a mod time of {$modTime}, compared to cached mod time {$checkTime}.");
                 $aModulesToReactivate[] = $id;
             }
         }
@@ -163,7 +162,8 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
         if (count($aModulesToReactivate) > 0)
         {
             if (!$bCleanupRun) {
-                $this->getModuleCleanupService()->fullCleanUp();
+                $this->log("Cleanup because of module metadata change");
+               $this->getModuleCleanupService()->fullCleanUp();
             }
 
             foreach ($aModulesToReactivate as $moduleId) {
@@ -179,7 +179,8 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
             }
         }
         oxRegistry::getConfig()->saveShopConfVar('arr', self::CACHED_CONFIG, $data, null, 'yamm/yamm');
-        oxRegistry::getConfig()->saveShopConfVar('num', self::LAST_MODIFIED, $configModTime, null, 'yamm/yamm');
+        oxRegistry::getConfig()->saveShopConfVar('', self::LAST_MODIFIED, $configModTime, null, 'yamm/yamm');
+        $this->log("Cached {$configModTime}");
     }
 
     /**
