@@ -101,6 +101,8 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
      */
     private function handleConfigChanges($modulePaths)
     {
+
+        $blCacheConfig = false;
         $data = oxRegistry::getConfig()->getShopConfVar(self::CACHED_CONFIG, null, 'yamm/yamm');
         $oModule = oxNew('oxModule');
         if ( !$data ) {
@@ -108,18 +110,16 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
         }
         $newlyActivated = array();
 
-        $bCleanupRun = false;
-
         $configModTime = $this->configLoader->getConfigModificationTime();
         $checkTime = oxRegistry::getConfig()->getShopConfVar(self::LAST_MODIFIED, null, 'yamm/yamm');
-        $this->log("YAMM Config Modification Time: {$configModTime}, Last Modified: {$configModTime}");
+        $this->log("YAMM Config Modification Time: {$configModTime}, Last Modified: {$checkTime}");
 
         if ( $checkTime < $configModTime || defined('YAMM_FORCE_RELOAD') ) {
             
             foreach ($this->_staticEntries[self::ENABLED] as $id) {
                 $oModule->load($id);
                 if ( !$oModule->isActive() ) {
-                    error_log("Activate {$id}");
+                    $this->log("Activate {$id}");
                     $this->activate($oModule);
                     $newlyActivated[] = $id;
                 }
@@ -134,11 +134,14 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
             foreach ($toDeactivate as $id) {
                 if ( $oModule->load($id) ) {
                     if ( $oModule->isActive() ) {
-                        error_log("Deactivate {$id}");
+                        $this->log("Deactivate {$id}");
                         $this->activate($oModule, 'deactivate');
                     }
                 }
             }
+
+            // Activate recaching of config
+            $blCacheConfig = true;
         }
 
         $aModulesToReactivate = array();
@@ -161,26 +164,32 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
 
         if (count($aModulesToReactivate) > 0)
         {
-            if (!$bCleanupRun) {
-                $this->log("Cleanup because of module metadata change");
-               $this->getModuleCleanupService()->fullCleanUp();
-            }
+            $this->log("Cleanup because of module metadata change");
+            $this->getModuleCleanupService()->fullCleanUp();
+
 
             foreach ($aModulesToReactivate as $moduleId) {
                 $this->reactivateModule($moduleId);
             }
+
+            $data = array('config' => $this->_staticEntries, 'metafiles' => array(), );
+            foreach ($this->_staticEntries[self::ENABLED] as $id) {
+                $metaFile = rtrim(getShopBasePath(), '/') . '/modules/' . $modulePaths[$id] . '/metadata.php';
+                if (file_exists($metaFile)) {
+                    $data['metafiles'][$id] = array('metafile' => $metaFile, 'last_modified' => filemtime($metaFile), );
+                }
+            }
+
+            $blCacheConfig = true;
         }
 
-        $data = array('config' => $this->_staticEntries, 'metafiles' => array(), );
-        foreach ($this->_staticEntries[self::ENABLED] as $id) {
-            $metaFile = rtrim(getShopBasePath(), '/') . '/modules/' . $modulePaths[$id] . '/metadata.php';
-            if (file_exists($metaFile)) {
-                $data['metafiles'][$id] = array('metafile' => $metaFile, 'last_modified' => filemtime($metaFile), );
-            }
+        if ($blCacheConfig)
+        {
+            oxRegistry::getConfig()->saveShopConfVar('arr', self::CACHED_CONFIG, $data, null, 'yamm/yamm');
+            oxRegistry::getConfig()->saveShopConfVar('', self::LAST_MODIFIED, $configModTime, null, 'yamm/yamm');
+            $this->log("Cached {$configModTime}");
         }
-        oxRegistry::getConfig()->saveShopConfVar('arr', self::CACHED_CONFIG, $data, null, 'yamm/yamm');
-        oxRegistry::getConfig()->saveShopConfVar('', self::LAST_MODIFIED, $configModTime, null, 'yamm/yamm');
-        $this->log("Cached {$configModTime}");
+
     }
 
     /**
@@ -210,7 +219,6 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
      */
     private function initYAMM()
     {
-
         $startTime = microtime(true);
         // Only execute the heavy lifting once
         if (self::$_bInitCalled) {
@@ -246,23 +254,35 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
 
             $this->handleConfigChanges($modulePaths);
 
-            $this->_staticEntries['aModules']           = parent::getModuleVar('aModules');
-            $this->_staticEntries['aModuleFiles']       = parent::getModuleVar('aModuleFiles') ? parent::getModuleVar('aModuleFiles') : array();
-            $this->_staticEntries['aModuleTemplates']   = parent::getModuleVar('aModuleTemplates') ? parent::getModuleVar('aModuleTemplates') : array();
+            $this->_staticEntries['aModules'] = parent::getModuleVar('aModules');
+            $enabledModules = array_diff($modulePaths, parent::getModuleVar('aDisabledModules'));
 
             foreach ($this->_staticEntries['aModules'] as $key => $value) {
                 $this->_staticEntries['aModules'][$key] = explode('&', $value);
             }
 
             $moduleMeta = array();
-            foreach ($this->_staticEntries[self::ENABLED] as $module) {
-                $metaFile = getShopBasePath() . '/modules/' . $modulePaths[$module] . '/metadata.php';
-                $aModule = array();
-                @include ($metaFile);
-                $moduleMeta[$module] = $aModule;
-                $this->_staticEntries['aModuleTemplates'][$module] = isset($aModule['templates']) ? $aModule['templates'] : null;
-                $this->_staticEntries['aModuleFiles'][$module] = isset($aModule['files']) ? array_change_key_case($aModule['files'], CASE_LOWER) : null;
+            // Check metadata of all modules, regardless if it is enabled by yamm or by the user
+            foreach ($enabledModules as $moduleId => $moduleName) {
+                $metaFile = getShopBasePath() . '/modules/' . $modulePaths[$moduleId] . '/metadata.php';
+
+                if (!file_exists($metaFile)) {
+                    $this->log("Metadata not found: " . $metaFile);
+                    continue;
+                }
+
+                $fn = function($metadata) {
+                    include $metadata;
+                    return $aModule;
+                };
+                // echo $metaFile;
+                $aModule = $fn($metaFile);
+
+                $moduleMeta[$moduleId] = $aModule;
+                $this->_staticEntries['aModuleTemplates'][$moduleId] = isset($aModule['templates']) ? $aModule['templates'] : null;
+                $this->_staticEntries['aModuleFiles'][$moduleId] = isset($aModule['files']) ? array_change_key_case($aModule['files'], CASE_LOWER) : null;
             }
+
 
             // @formatter:off
             $extensions = array_map(function($meta) {
@@ -271,12 +291,11 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
             // @formatter:on
             $extensions = call_user_func_array(array_merge, array_values($extensions));
             $extensions = array_unique($extensions);
-
             foreach ($extensions as $class) {
                 $classes = array();
-                foreach ($this->getOrderForClass($class) as $module) {
-                    if ( isset($moduleMeta[$module]['extend']) && array_key_exists($class, $moduleMeta[$module]['extend']) ) {
-                        $classes[] = $moduleMeta[$module]['extend'][$class];
+                foreach ($this->getOrderForClass($class) as $moduleId) {
+                    if ( isset($moduleMeta[$moduleId]['extend']) && array_key_exists($class, $moduleMeta[$moduleId]['extend']) ) {
+                        $classes[] = $moduleMeta[$moduleId]['extend'][$class];
                     }
                 }
 
@@ -286,8 +305,8 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
             foreach ($this->_staticEntries['aModules'] as $key => $value) {
                 $this->_staticEntries['aModules'][$key] = implode('&', $value);
             }
-        }
 
+        }
         $runTime = microtime(true) - $startTime;
         $this->log(sprintf("InitYAMM runtime %f seconds", $runTime));
     }
@@ -297,7 +316,10 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
      * @param $message
      */
     private function log($message) {
-        oxRegistry::getUtils()->writeToLog(sprintf("%s: %s \n", date("Y-m-d H:i:s"), $message), 'yamm.log');
+        if (oxRegistry::getConfig()->getConfigParam('blEnableYAMMLog'))
+        {
+            oxRegistry::getUtils()->writeToLog(sprintf("%s: %s \n", date("Y-m-d H:i:s"), $message), 'yamm.log');
+        }
     }
 
     /**
@@ -372,10 +394,12 @@ class yamm_oxutilsobject extends yamm_oxutilsobject_parent
                     $this->_staticEntries[self::ENABLED]
                 );
                 // @formatter:on
-            } elseif ( is_array($this->_staticEntries[$sModuleVarName]) && parent::getModuleVar($sModuleVarName) ) {
-                $old = parent::getModuleVar($sModuleVarName);
+            } elseif ( is_array($this->_staticEntries[$sModuleVarName]) && $old = parent::getModuleVar($sModuleVarName)) {
+
                 $new = $this->_staticEntries[$sModuleVarName];
+
                 $result = ($new == $old) ? $new : array_merge($old, $new);
+
             } else {
                 $result = $this->_staticEntries[$sModuleVarName];
             }
